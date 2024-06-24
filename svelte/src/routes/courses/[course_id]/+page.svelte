@@ -4,7 +4,7 @@
     import { page } from '$app/stores';
     import type { CourseData } from "../../../models/CourseData";
     import CourseFormCard from "./CourseFormCard.svelte";
-    import * as api from "../../../services/api";
+    import * as api from "../../../api
     import type { HoleData } from "../../../models/HoleData";
 
     $: params = $page.params;
@@ -27,6 +27,7 @@
         par: 0,
         boundPoints: [],
     };
+    let tees: TeeData[] = [];
 
     onMount(async () => {
         let courseDetails = await api.fetchCourseDetails(id);
@@ -34,6 +35,12 @@
             course = courseDetails;
         }
 
+        let teeDetails = await api.fetchTees(id);
+        if (teeDetails) {
+            tees = teeDetails;
+            tees.sort((a, b) => a.yardage - b.yardage);
+        }
+        
         await fetchCurrentlySelectedHoleDetails();
     });
 
@@ -65,7 +72,7 @@
         </div>
     </div>
     <div class="col-4">
-        <CourseFormCard bind:course saveCourse={async () => await api.saveCourse(id, course)} />
+        <CourseFormCard bind:course saveCourse={async () => await api.saveCourse(id, course)} {tees} />
         <div class="card">
             <div class="card-body">
                 <h5 class="hole-card-title card-title">

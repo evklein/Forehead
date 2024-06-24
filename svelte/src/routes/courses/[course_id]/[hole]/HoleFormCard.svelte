@@ -35,7 +35,7 @@
             </div>
         </h5>
         <div class="input-group mb-3">
-            <span class="input-group-text" id="name-addon"><i class="fa-solid fa-signature"></i></span>
+            <span class="input-group-text" id="name-addon"><i class="fa fa-tag"></i></span>
             <input type="text"
                 bind:value={hole.nickname}
                 class="form-control"

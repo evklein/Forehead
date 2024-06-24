@@ -4,6 +4,7 @@
 
     export let course: CourseData;
     export let saveCourse: EventHandler;
+    export let tees: TeeData[];
 </script>
 
 <div class="card">
@@ -11,6 +12,13 @@
         <h5 class="card-title">
             {course.name}
         </h5>
+        <div class="row align-items-start mb-2">
+            <div class="col-12 tee-box">
+                {#each tees as tee}
+                    <span class="tee" style="background: #{tee.color}" title={tee.name}></span>
+                {/each}
+            </div>
+        </div>
         <div class="row align-items-start">
             <div class="col-6">
                 <div class="input-group mb-3 col-6">
@@ -63,5 +71,17 @@
 <style>
     textarea {
         max-height: 400px;
+    }
+    .tee-box {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+    }
+    .tee {
+        margin: 2px;
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 40px;
     }
 </style>

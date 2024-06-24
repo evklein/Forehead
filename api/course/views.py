@@ -3,9 +3,7 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-
-
-from .models import Course, Hole
+from .models import Course, Hole, Tee
 
 @csrf_exempt
 def index(request):
@@ -82,6 +80,13 @@ def save_hole(request, course_id, hole_number):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+def get_tees(request, course_id):
+    course = Course.objects.get(pk=course_id)
+    tees = Tee.objects.filter(course=course)
+    data = serializers.serialize('json', tees)
+    return HttpResponse(data, content_type='application/json')
+
 
 
 

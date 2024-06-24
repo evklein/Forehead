@@ -4,8 +4,15 @@ from course.models import Course, Tee, Hole
 
 class Round(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    tees = models.ForeignKey(Tee, on_delete=models.CASCADE)
     date_played = models.DateField()
+    tee_time = models.CharField(max_length = 50)
+    finish_time = models.CharField(max_length = 50)
+    holes_completed = models.IntegerField()
+    played_tee = models.ForeignKey(Tee, on_delete=models.CASCADE)
+    group_makeup = models.CharField(max_length = 50)
+    mobility = models.CharField(max_length = 50)
+    round_counts_toward_hci = models.BooleanField()
+    notes = models.CharField()
 
 class HoleScore(models.Model):
     score = models.IntegerField()
@@ -17,7 +24,7 @@ class HoleScore(models.Model):
     hole = models.ForeignKey(Hole, on_delete=models.CASCADE)
 
 class Stroke(models.Model):
-    stroke = models.IntegerField()
+    stroke_number = models.IntegerField()
     club = models.CharField(max_length = 50)
     distance = models.IntegerField()
     start_coordinate = models.JSONField()
@@ -25,7 +32,7 @@ class Stroke(models.Model):
     hole_score = models.ForeignKey(HoleScore, on_delete=models.CASCADE)
 
 class Putt(models.Model):
-    stroke = models.IntegerField()
+    stroke_number = models.IntegerField()
     distance = models.IntegerField()
     hole_score = models.ForeignKey(HoleScore, on_delete=models.CASCADE)
 

@@ -18,8 +18,8 @@ class Tee(models.Model):
     color =  models.CharField(max_length = 6)
     name = models.CharField(max_length = 200)
     yardage = models.IntegerField(null = True)
-    slope = models.IntegerField()
-    rating = models.IntegerField()
+    slope = models.FloatField()
+    rating = models.FloatField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
 class Hole(models.Model):

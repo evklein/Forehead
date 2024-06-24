@@ -3,7 +3,7 @@
     import Map from "../../../../components/shared/Map.svelte";
     import { page } from '$app/stores';
     import type { CourseData } from "../../../../models/CourseData";
-    import * as api from "../../../../services/api";
+    import * as api from "../../../../api
     import type { HoleData } from "../../../../models/HoleData";
     import HoleFormCard from "./HoleFormCard.svelte";
 
@@ -46,7 +46,7 @@
     });
 </script>
 <div class="row align-items-start">
-    <div class="col-8">
+    <div class="col-7">
     {#if mapCanBeLoaded}
         {#if initialBoundPointCount === 0}
             <Map bind:focusBounds={course.boundPoints} bind:selectedBounds={hole.boundPoints} highlightSelectedbounds={false} />
@@ -55,7 +55,7 @@
         {/if}
     {/if}
     </div>
-    <div class="col-4">
+    <div class="col-5">
         <HoleFormCard {courseId} {holeNumber} courseName={course.name} bind:hole saveHole={async() => await api.saveHole(courseId, hole)} />
     </div>
 </div>
