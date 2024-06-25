@@ -3,7 +3,7 @@
     import Map from "../../../../components/shared/Map.svelte";
     import { page } from '$app/stores';
     import type { CourseData } from "../../../../models/CourseData";
-    import * as api from "../../../../api
+    import * as api from "../../../../services/api"
     import type { HoleData } from "../../../../models/HoleData";
     import HoleFormCard from "./HoleFormCard.svelte";
 

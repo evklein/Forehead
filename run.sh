@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Take a copy of the database
+date=$(date '+%Y-%m-%d-%H_%M_%S')
+cp api/db.sqlite3 backups/backup-$date.sqlite3
+
 # Start the Svelte development server
 cd svelte
 npm run dev &

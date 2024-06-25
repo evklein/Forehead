@@ -4,7 +4,7 @@
     import { page } from '$app/stores';
     import type { CourseData } from "../../../models/CourseData";
     import CourseFormCard from "./CourseFormCard.svelte";
-    import * as api from "../../../api
+    import * as api from "../../../services/api";
     import type { HoleData } from "../../../models/HoleData";
 
     $: params = $page.params;

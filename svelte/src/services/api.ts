@@ -1,8 +1,35 @@
-import * as apiHelpers from "./services/apiHelpers";
-import type { CourseData } from "./models/CourseData";
-import type { HoleData } from "./models/HoleData";
+import * as apiHelpers from "./apiHelpers";
+import type { CourseData } from "../models/CourseData";
+import type { HoleData } from "../models/HoleData";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
+
+export async function fetchAllCourses(): Promise<CourseData[] | null> {
+    const endpoint = `/course/all`;
+    try {
+        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        let courses: CourseData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextCourse = rawData[i];
+            courses.push({
+                courseId: nextCourse['pk'],
+                name: nextCourse['fields']['name'],
+                address: nextCourse['fields']['address'],
+                par: nextCourse['fields']['par'],
+                designer: nextCourse['fields']['designer'],
+                boundPoints: nextCourse['fields']['bound_points'] ?? [],
+                numberOfHoles: nextCourse['fields']['num_holes'],
+                imageUrl: nextCourse['fields']['image_url'],
+                public: nextCourse['fields']['public'],
+            });
+        }
+        return courses;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return null;
+    }
+}
 
 export async function fetchCourseDetails(id: number): Promise<CourseData | null> {
     const endpoint = `/course/${id}/details/`;
@@ -97,8 +124,9 @@ export async function fetchTees(courseId: number) {
         for (let i = 0; i < rawData.length; i++) {
             let nextObject = rawData[i];
             tees.push({
+                id: nextObject['pk'],
                 color: nextObject['fields']['color'],
-                name: nextObject['fields']['white'],
+                name: nextObject['fields']['name'],
                 yardage: nextObject['fields']['yardage'],
                 slope: nextObject['fields']['slope'],
                 rating: nextObject['fields']['rating'],
