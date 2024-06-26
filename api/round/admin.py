@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Round, HoleScore, Stroke, Putt
+
+admin.site.register(Round)
+admin.site.register(HoleScore)
+admin.site.register(Stroke)
+admin.site.register(Putt)
