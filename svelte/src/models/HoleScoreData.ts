@@ -1,4 +1,4 @@
-interface HoleScoreData {
+export interface HoleScoreData {
     score: number;
     putts: number;
     greenInRegulation: boolean;

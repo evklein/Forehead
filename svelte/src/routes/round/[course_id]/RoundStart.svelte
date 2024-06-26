@@ -1,7 +1,13 @@
 <script lang="ts">
+    import type { EventHandler } from "svelte/elements";
+    import type { RoundData } from "../../../models/RoundData";
+    import type { TeeData } from "../../../models/TeeData";
+    import { RoundStage } from "../RoundStage";
+
     export let courseName: string;
     export let round: RoundData;
     export let tees: TeeData[];
+    export let handleAdvance: EventHandler;
 </script>
 <div class="row align-items-start">
     <div class="card">
@@ -150,7 +156,7 @@
                     </div>
                 </div>
                 <div class="card-buttons">
-                    <button class="btn btn-success">
+                    <button class="btn btn-success" on:click={handleAdvance}>
                         <i class="fa-solid fa-arrow-right"></i> Start Round
                     </button>
                 </div>

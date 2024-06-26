@@ -1,4 +1,4 @@
-interface RoundData {
+export interface RoundData {
     courseId?: number;
     datePlayed?: Date;
     teeTime?: string;

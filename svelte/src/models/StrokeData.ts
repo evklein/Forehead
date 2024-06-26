@@ -1,4 +1,4 @@
-interface StrokeData {
+export interface StrokeData {
     strokeNumber: number;
     club: string;
     distance: number;

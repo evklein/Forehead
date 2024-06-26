@@ -1,4 +1,4 @@
-interface TeeData {
+export interface TeeData {
     id: number;
     color: string;
     name?: string;

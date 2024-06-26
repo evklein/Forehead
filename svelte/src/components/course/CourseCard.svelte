@@ -15,7 +15,7 @@
             </h5>
             <p class="card-text">{course.address}</p>
             <a href={`/courses/${course.courseId}`} class="btn btn-primary">Edit Details <i class="fa-solid fa-pencil"></i></a>
-            <a href="/round" class="btn btn-success">Start Round <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="/round/{course.courseId}" class="btn btn-success">Start Round <i class="fa-solid fa-arrow-right"></i></a>
         </div>
     </div>
 </div>

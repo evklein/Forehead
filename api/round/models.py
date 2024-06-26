@@ -3,6 +3,7 @@ from django.db import models
 from course.models import Course, Tee, Hole
 
 class Round(models.Model):
+    nickname = models.CharField(max_length = 200, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date_played = models.DateField()
     tee_time = models.CharField(max_length = 50, null=True, blank=True)

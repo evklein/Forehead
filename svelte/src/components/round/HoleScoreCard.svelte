@@ -1,56 +1,23 @@
 <script lang="ts">
+    import type { EventHandler } from "svelte/elements";
+    import type { HoleData } from "../../models/HoleData";
+    import type { HoleScoreData } from "../../models/HoleScoreData";
+
     // Props
     export let courseName: string;
-    export let numberOfHoles: number;
-
-    interface HoleScore {
-        hole: number;
-        numberOfStrokes?: number;
-        numberOfPutts?: number;
-        gir?: boolean;
-        gld?: boolean;
-        scrambling?: boolean;
-        strokes: Stroke[];
-    }
-
-    interface Stroke {
-        club: string;
-        distance: number;
-        startCoordinate: Object;
-        endCoordinate: Object;
-    }
-
-    interface Putt {
-        distance: number;
-    }
-
-    let holeScores: HoleScore[] = [];
-    let currentHole = 1;
-    let currentHoleScore: HoleScore = {
-        hole: 1,
-        strokes: [],
-    };
-
-    function goToNextHole() {
-        console.log(currentHole);
-        currentHole += currentHole !== numberOfHoles ? 1 : 0;
-    }
-
-    function goToPreviousHole() {
-        currentHole -= currentHole !== 1 ? 1 : 0;
-    }
-
-    function finishRound() {
-
-    }
+    export let maximumNumberOfHoles: number;
+    export let hole: HoleData;
+    export let holeScore: HoleScoreData;
+    export let handleGoToNextHole: EventHandler;
+    export let handleGoToPreviousHole: EventHandler;
+    export let handleAdvance: EventHandler;
 </script>
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">
-            <span class="card-title-emphasize">Hole {currentHole}</span> // {courseName}
+            <span class="card-title-emphasize">Hole {hole.holeNumber}</span> // {courseName}
             <span class="par-badge badge text-bg-success">Par 4</span>
         </h5>
-        <p class="card-text"><b>310 yards</b></p>
         <div class="score-entry">
             <table class="table table-bordered">
                 <thead>
@@ -66,13 +33,13 @@
                     <tr>
                         <td class="td-20">
                             <input type="text"
-                                bind:value={currentHoleScore.numberOfStrokes}
+                                bind:value={holeScore.score}
                                 class="stats-control form-control"
                                 aria-label="strokes">
                         </td>
                         <td class="td-20">
                             <input type="text"
-                                bind:value={currentHoleScore.numberOfPutts}
+                                bind:value={holeScore.putts}
                                 class="stats-control form-control"
                                 aria-label="putts">
                         </td>
@@ -100,8 +67,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if currentHoleScore.numberOfStrokes && currentHoleScore.numberOfPutts}
-                        {#each {length: currentHoleScore.numberOfStrokes - currentHoleScore.numberOfPutts} as _, i}
+                    {#if holeScore.score && holeScore.putts}
+                        {#each {length: holeScore.score - holeScore.putts} as _, i}
                             <tr>
                                 <td>{i + 1}</td>
                                 <td></td>
@@ -123,10 +90,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if currentHoleScore.numberOfStrokes && currentHoleScore.numberOfPutts}
-                        {#each {length: currentHoleScore.numberOfPutts ?? 0} as _, i}
+                    {#if holeScore.score && holeScore.putts}
+                        {#each {length: holeScore.putts ?? 0} as _, i}
                         <tr>
-                            <td>{currentHoleScore.numberOfStrokes - currentHoleScore.numberOfPutts + i + 1}</td>
+                            <td>{holeScore.score - holeScore.putts + i + 1}</td>
                             <td>{i + 1}</td>
                             <td></td>
                         </tr>
@@ -140,23 +107,23 @@
             
         </div>
         <div class="card-right">
-             {#if currentHole !== 1}
+             {#if hole.holeNumber !== 1}
                 <a href="/"
-                    on:click|preventDefault={goToPreviousHole}
+                    on:click|preventDefault={handleGoToPreviousHole}
                     class="btn btn-success">
                     <i class="fa-solid fa-arrow-left"></i> Prev Hole
                 </a>
             {/if}                
             <a href="/" class="btn btn-secondary"><i class="fas fa-redo"></i> Start over</a>
-            {#if currentHole !== numberOfHoles}
+            {#if hole.holeNumber !== maximumNumberOfHoles}
                 <a href="/"
-                    on:click|preventDefault={goToNextHole}
+                    on:click|preventDefault={handleGoToNextHole}
                     class="btn btn-success">
                     <i class="fa-solid fa-arrow-right"></i> Next Hole
                 </a>
             {:else}
                 <a href="/"
-                    on:click|preventDefault={finishRound}
+                    on:click|preventDefault={handleAdvance}
                     class="btn btn-success">
                     <i class="fa-solid fa-check"></i> Finish Round
                 </a>

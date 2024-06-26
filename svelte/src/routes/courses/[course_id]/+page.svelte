@@ -6,6 +6,7 @@
     import CourseFormCard from "./CourseFormCard.svelte";
     import * as api from "../../../services/api";
     import type { HoleData } from "../../../models/HoleData";
+    import type { TeeData } from "../../../models/TeeData";
 
     $: params = $page.params;
     $: id = Number(params.course_id);

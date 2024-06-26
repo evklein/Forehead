@@ -1,6 +1,7 @@
 import * as apiHelpers from "./apiHelpers";
 import type { CourseData } from "../models/CourseData";
 import type { HoleData } from "../models/HoleData";
+import type { TeeData } from "../models/TeeData";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -72,6 +73,29 @@ export async function saveCourse(id: number, course: CourseData) {
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
+    }
+}
+
+export async function fetchHoles(courseId: number): Promise<HoleData[]> {
+    const endpoint = `/course/${courseId}/holes/`;
+    try {
+        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        let holes: HoleData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextHoleData = rawData[i];
+            holes.push({
+                holeNumber: nextHoleData['fields']['hole_number'],
+                nickname: nextHoleData['fields']['nickname'],
+                par: nextHoleData['fields']['par'],
+                boundPoints: nextHoleData['fields']['bound_points'] ?? [],
+                centerGreenPoint: JSON.parse(nextHoleData['fields']['center_green_point']),
+            });
+        }
+        return holes;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return [];
     }
 }
 

@@ -52,6 +52,12 @@ def hole(request, course_id, hole_number):
     trimmed_data = data[1:-1]
     return HttpResponse(trimmed_data, content_type='application/json')
 
+def holes(request, course_id):
+    course = Course.objects.get(pk=course_id)
+    holes = Hole.objects.filter(course=course)
+    data = serializers.serialize('json', holes)
+    return HttpResponse(data, content_type='application/json')
+
 @csrf_exempt
 def save_hole(request, course_id, hole_number):
     if request.method == 'POST':
