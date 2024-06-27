@@ -15,9 +15,7 @@ class Round(models.Model):
     round_counts_toward_hci = models.BooleanField()
     notes = models.CharField(max_length = 5000, null=True, blank=True)
 
-class HoleScore(models.Model):
-    score = models.IntegerField()
-    putts = models.IntegerField()
+class HoleStats(models.Model):
     gir = models.BooleanField()
     gld = models.BooleanField()
     scrambling = models.BooleanField(null = True)
@@ -30,10 +28,10 @@ class Stroke(models.Model):
     distance = models.IntegerField()
     start_coordinate = models.JSONField()
     end_coordinate = models.JSONField(null = True)
-    hole_score = models.ForeignKey(HoleScore, on_delete=models.CASCADE)
+    hole_stats = models.ForeignKey(HoleStats, on_delete=models.CASCADE)
 
 class Putt(models.Model):
     stroke_number = models.IntegerField()
     distance = models.IntegerField()
-    hole_score = models.ForeignKey(HoleScore, on_delete=models.CASCADE)
+    hole_stats = models.ForeignKey(HoleStats, on_delete=models.CASCADE)
 

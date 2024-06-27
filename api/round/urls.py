@@ -4,13 +4,8 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("<int:round_id>/", views.fetchRound, name="fetchRound"),
-    path("<int:round_id>/hole-scores/", views.fetchRoundHoleScores, name="fetchRoundHoleScores"),
-
-    path("hole-score/<int:hole_score_id>/", views.fetchHoleScore, name="fetchHoleScore"),
-    path("hole-score/<int:hole_score_id>/strokes/", views.fetchHoleScoreStrokes, name="fetchHoleScoreStrokes"),
-    path("hole-score/<int:hole_score_id>/putts/", views.fetchHoleScorePutts, name="fetchHoleScorePutts"),
-
-    path("stroke/<int:stroke_id>/", views.fetchStroke, name="fetchStroke"),
-    
-    path("putt/<int:putt_id>/", views.fetchPutt, name="fetchPutt")
+    path("<int:round_id>/holes/", views.fetchAllHoleStatsForRound, name="fetchAllHoleStatsForRound"),
+    path("<int:round_id>/hole/<int:hole_id>/", views.fetchHoleStats, name="fetchHoleStats"),
+    path("<int:round_id>/hole/<int:hole_id>/strokes/", views.fetchHoleStrokes, name="fetchHoleStrokes"),
+    path("<int:round_id>/hole/<int:hole_id>/putts/", views.fetchHolePutts, name="fetchHolePutts"),
 ]
