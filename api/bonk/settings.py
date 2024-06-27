@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'course.apps.CourseConfig',
     'round.apps.RoundConfig',
     'corsheaders',
+    'schema_viewer',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
