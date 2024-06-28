@@ -5,14 +5,18 @@
     export let selectedBounds: [number, number][];
     export let highlightSelectedbounds: boolean;
     export let specialPoints: [number, number][] = [];
+    export let handleSelectPointOnMap: Function;
 
     let map: L.Map;
 
     onMount(async () => {
+        await buildMap();
+    });
+
+    async function buildMap() {
         const L = await import('leaflet');
         await import('leaflet/dist/leaflet.css');
 
-        console.log(map);
         if (!map) {
             map = L.map('map').setView([0, 0], 0);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -34,6 +38,8 @@
                 marker.bindPopup(`[${wrappedCoordinates.lat}, ${wrappedCoordinates.lng}]`);
                 selectedBounds.push([wrappedCoordinates.lat, wrappedCoordinates.lng]);
                 selectedBounds = selectedBounds;
+
+                handleSelectPointOnMap(wrappedCoordinates);
             });
 
             if (specialPoints && Array.isArray(specialPoints)) {
@@ -47,9 +53,11 @@
                 });
             }
         }
-    });
+    }
 </script>
-
+<div id="map-wrapper">
+    <div id="map"></div>
+</div>
 <style>
     #map-wrapper {
         height: 100%;
@@ -62,7 +70,3 @@
         border-radius:5px;
     }
 </style>
-
-<div id="map-wrapper">
-    <div id="map"></div>
-</div>

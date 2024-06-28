@@ -1,22 +1,60 @@
 <script lang="ts">
     import type { EventHandler } from "svelte/elements";
     import type { HoleData } from "../../models/HoleData";
-    import type { HoleScoreData } from "../../models/HoleScoreData";
+    import type { HoleScore } from "../../models/HoleScore";
+    import * as geo from "../../services/geo";
 
     // Props
     export let courseName: string;
     export let maximumNumberOfHoles: number;
     export let hole: HoleData;
-    export let holeScore: HoleScoreData;
+    export let holeScore: HoleScore;
     export let handleGoToNextHole: EventHandler;
     export let handleGoToPreviousHole: EventHandler;
     export let handleAdvance: EventHandler;
+    export let selectedPoints: [number, number][];
+
+    let strokes: number;
+    let putts: number;
+
+    let clubs: string[] = [
+        '62°',
+        '56°',
+        '50°',
+        'P',
+        '9',
+        '8',
+        '7',
+        '6',
+        '5',
+        '4H',
+        '3H',
+        '3W',
+        'D'
+    ];
+
+    function createStrokesAndPutts(event: any) {
+        holeScore.strokes = [];
+        holeScore.putts = [];
+
+        for (let i = 0; i < strokes; i++) {
+            holeScore.strokes.push({
+                strokeNumber: i + 1,                
+            });
+        }
+
+        for (let i = 0; i < putts; i++) {
+            holeScore.putts.push({
+                strokeNumber: i + strokes + 1,
+            });
+        }
+    }
 </script>
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">
-            <span class="card-title-emphasize">Hole {hole.holeNumber}</span> // {courseName}
-            <span class="par-badge badge text-bg-success">Par 4</span>
+            <span class="card-title-emphasize">Hole {hole?.holeNumber}</span> // {courseName}
+            <span class="par-badge badge text-bg-success">Par {hole?.par}</span>
         </h5>
         <div class="score-entry">
             <table class="table table-bordered">
@@ -33,14 +71,15 @@
                     <tr>
                         <td class="td-20">
                             <input type="text"
-                                bind:value={holeScore.score}
                                 class="stats-control form-control"
+                                bind:value={strokes}
                                 aria-label="strokes">
                         </td>
                         <td class="td-20">
                             <input type="text"
-                                bind:value={holeScore.putts}
                                 class="stats-control form-control"
+                                bind:value={putts}
+                                on:change|preventDefault={createStrokesAndPutts}
                                 aria-label="putts">
                         </td>
                         <td class="td-20">
@@ -50,7 +89,12 @@
                             <input class="score-checkbox form-check-input" type="checkbox" value="" id="flexCheckDefault">
                         </td>
                         <td class="td-20">
-                            <input class="score-checkbox form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            {#if holeScore?.stats?.greenInRegulation}
+                                <input class="score-checkbox form-check-input"
+                                        type="checkbox" value="" id="flexCheckDefault">
+                            {:else}
+                                <span class="disabled-checkbox-placeholder">-</span>
+                            {/if}
                         </td>
                     </tr>
                 </tbody>
@@ -67,13 +111,35 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if holeScore.score && holeScore.putts}
-                        {#each {length: holeScore.score - holeScore.putts} as _, i}
+                    {#if holeScore?.strokes && holeScore?.putts}
+                        {#each {length: holeScore.strokes.length - holeScore.putts.length} as _, strokeNumber}
                             <tr>
-                                <td>{i + 1}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>{strokeNumber + 1}</td>
+                                <td>
+                                    <select
+                                        class="form-select"
+                                        id="floatingSelect"
+                                        aria-label="club-select"
+                                    >
+                                        <option selected>Club</option>
+                                        {#each clubs as club}
+                                            <option>
+                                                {club}
+                                            </option>
+                                        {/each}
+                                    </select>                                    
+                                </td>
+                                <td>
+                                    {#if selectedPoints && selectedPoints.length >= strokeNumber + 2}
+                                        {geo.getDistanceFromLatLonInYards(selectedPoints[strokeNumber][0], selectedPoints[strokeNumber][1], selectedPoints[strokeNumber + 1][0], selectedPoints[strokeNumber + 1][1]).toFixed(1)}
+                                    {/if}
+                                </td>
+                                <td>
+                                    {#if selectedPoints && selectedPoints.length >= strokeNumber + 2 && hole && hole.centerGreenPoint}
+                                        {geo.getDistanceFromLatLonInYards(hole.centerGreenPoint[0], hole.centerGreenPoint[1], selectedPoints[strokeNumber + 1][0], selectedPoints[strokeNumber + 1][1]).toFixed(1)}
+                                    {/if}
+
+                                </td>
                             </tr>
                         {/each}
                     {/if}
@@ -90,12 +156,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#if holeScore.score && holeScore.putts}
-                        {#each {length: holeScore.putts ?? 0} as _, i}
+                    {#if holeScore?.strokes && holeScore?.putts}
+                        {#each {length: holeScore.putts.length ?? 0} as _, i}
                         <tr>
-                            <td>{holeScore.score - holeScore.putts + i + 1}</td>
+                            <td>{holeScore.strokes.length - holeScore.putts.length + i + 1}</td>
                             <td>{i + 1}</td>
-                            <td></td>
+                            <td>
+                                <input class="form-control" type="text" placeholder="" />
+                            </td>
                         </tr>
                         {/each}
                     {/if}
@@ -107,7 +175,7 @@
             
         </div>
         <div class="card-right">
-             {#if hole.holeNumber !== 1}
+             {#if hole?.holeNumber !== 1}
                 <a href="/"
                     on:click|preventDefault={handleGoToPreviousHole}
                     class="btn btn-success">
@@ -115,11 +183,11 @@
                 </a>
             {/if}                
             <a href="/" class="btn btn-secondary"><i class="fas fa-redo"></i> Start over</a>
-            {#if hole.holeNumber !== maximumNumberOfHoles}
+            {#if hole?.holeNumber !== maximumNumberOfHoles}
                 <a href="/"
                     on:click|preventDefault={handleGoToNextHole}
                     class="btn btn-success">
-                    <i class="fa-solid fa-arrow-right"></i> Next Hole
+                    <i class="fa-solid fa-arrow-right"></i> Save and go to next
                 </a>
             {:else}
                 <a href="/"
@@ -163,5 +231,12 @@
     }
     td.td-20 {
         width: 20%;
+    }
+    .disabled-checkbox-placeholder {
+        text-align: center;
+        font-size: 18pt;
+        color: #555;
+        display: block;
+        margin: auto;
     }
 </style>

@@ -6,13 +6,11 @@
     import Finalize from "./Finalize.svelte";
     import HoleEntry from "./HoleEntry.svelte";
     import type { HoleData } from "../../../models/HoleData";
-    import type { HoleScoreData } from "../../../models/HoleScoreData";
     import type { RoundData } from "../../../models/RoundData";
     import type { TeeData } from "../../../models/TeeData";
-    import type { StrokeData } from "../../../models/StrokeData";
-    import type { PuttData } from "../../../models/PuttData";
     import { page } from "$app/stores";
     import type { CourseData } from "../../../models/CourseData";
+    import type { HoleScore } from "../../../models/HoleScore";
 
     $: params = $page.params;
     $: courseId = Number(params.course_id);
@@ -27,12 +25,10 @@
         datePlayed: new Date(),
         mobility: "Walking",
     };
-    let holeScores: HoleScoreData[] = [];
-    let strokes: StrokeData[] = [];
-    let putts: PuttData[] = [];
+
+    let holeScores: HoleScore[];
 
     onMount(async () => {
-        // Get tees
         let courseDetails = await api.fetchCourseDetails(courseId);
         if (courseDetails) {
             course = courseDetails;
@@ -44,21 +40,16 @@
         if (course && course.numberOfHoles) {
             holeScores = Array.from({ length: course.numberOfHoles }, (_, index) => {
                 return {
-                    score: 0,
-                    putts: 0,
-                    greenInRegulation: false,
-                    greenLightDrive: false,
-                    scrambling: false,
-                    roundId: 0,
-                    holeId: 0,
+                    score: undefined,
+                    stats: {
+                        greenInRegulation: false,
+                        greenLightDrive: false,
+                    },
+                    strokes: [],
+                    putts: []
                 }
-            }
-            );
+            });
         }
-        console.log('All data retrieved');
-        console.log(course);
-        console.log(tees);
-        console.log(holes);
     });
 </script>
 {#if entryStage === RoundStage.Start}
