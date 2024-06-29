@@ -1,11 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { MapMarkerChoice } from './MapMarkerChoice';
 
     export let focusBounds: [number, number][];
     export let selectedBounds: [number, number][];
     export let highlightSelectedbounds: boolean;
     export let specialPoints: [number, number][] = [];
     export let handleSelectPointOnMap: Function;
+    export let markerChoice: MapMarkerChoice = MapMarkerChoice.Default;
 
     let map: L.Map;
 
@@ -33,12 +35,29 @@
 
             map.on('click', (e) => {
                 let wrappedCoordinates = e.latlng.wrap();
-                console.log(wrappedCoordinates);
-                let marker = L.marker(wrappedCoordinates).addTo(map);
-                marker.bindPopup(`[${wrappedCoordinates.lat}, ${wrappedCoordinates.lng}]`);
-                selectedBounds.push([wrappedCoordinates.lat, wrappedCoordinates.lng]);
-                selectedBounds = selectedBounds;
+                let marker: any;
+                switch (markerChoice) {
+                    case MapMarkerChoice.Default:
+                        marker = L.marker(wrappedCoordinates).addTo(map);
+                        marker.bindPopup(`[${wrappedCoordinates.lat}, ${wrappedCoordinates.lng}]`);
+                        break;
+                    case MapMarkerChoice.ShotTracer:
+                        marker = L.circleMarker(wrappedCoordinates, {
+                            fillColor: selectedBounds.length > 0 ? 'white' : 'yellow',
+                            color: selectedBounds.length > 0 ? 'white' : 'yellow',
+                            radius: 8,
+                        }).addTo(map);
+                        if (selectedBounds.length >= 1) {
+                            let lastSelectedBounds = selectedBounds[selectedBounds.length - 1];
+                            let line = L.polyline([wrappedCoordinates, lastSelectedBounds], { color: 'white' }).addTo(map);
 
+                        }
+                        break;
+                }
+                // selectedBounds.push([wrappedCoordinates.lat, wrappedCoordinates.lng]);
+                // selectedBounds = selectedBounds;
+
+                console.log(selectedBounds.length);
                 handleSelectPointOnMap(wrappedCoordinates);
             });
 

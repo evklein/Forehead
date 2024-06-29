@@ -40,7 +40,8 @@
         if (course && course.numberOfHoles) {
             holeScores = Array.from({ length: course.numberOfHoles }, (_, index) => {
                 return {
-                    score: undefined,
+                    numberOfStrokes: undefined,
+                    numberOfPutts: undefined,
                     stats: {
                         greenInRegulation: false,
                         greenLightDrive: false,

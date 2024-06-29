@@ -5,6 +5,8 @@
     import { onMount } from "svelte";
     import type { HoleScore } from "../../../models/HoleScore";
     import Map from "../../../components/shared/Map.svelte";
+    import InputDirector from "../../../components/round/InputDirector.svelte";
+    import { MapMarkerChoice } from "../../../components/shared/MapMarkerChoice";
 
     export let courseName: string;
     export let maximumNumberOfHoles: number;
@@ -40,16 +42,41 @@
         selectedPoints.push([position.lat, position.lng]);
         selectedPoints = selectedPoints;
     }
+
+    function getCurrentInstructions(): string {
+        if (currentHoleScore.numberOfStrokes && currentHoleScore.numberOfPutts) {
+            let numberOfPointToBeMarked = currentHoleScore.numberOfStrokes - currentHoleScore.numberOfPutts;
+            if (selectedPoints.length === 0) {
+                return `
+                    Mark any <span style="color: darkred; font-weight: bold;"">penalty shots</span> first on score card<br />
+                    Place <span style="color: gold; font-weight: bold;">tee shot</span> location
+                `;
+            } else if (selectedPoints.length < numberOfPointToBeMarked + 1) {
+                return `Place <b>${numberOfPointToBeMarked}</b> shots.`;
+            } else {
+                return `Fill in <span style="color: green; font-weight: bold;">putts table</span>`;
+            }
+        }
+
+
+        return "Fill out scorecard";
+    }
 </script>
 <div class="row align-items-start">
     <div class="col-6">
         {#if currentHole}
             {#key currentHoleIndex}
                 <Map focusBounds={currentHole.boundPoints}
-                    bind:selectedBounds={currentHole.boundPoints}
+                    bind:selectedBounds={selectedPoints}
                     highlightSelectedbounds={true}
                     handleSelectPointOnMap={selectPointOnMap}
+                    markerChoice={MapMarkerChoice.ShotTracer}
                 />
+                <InputDirector>
+                    {#key currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints}
+                        {@html getCurrentInstructions()}
+                    {/key}
+                </InputDirector>
             {/key}
         {/if}
     </div>

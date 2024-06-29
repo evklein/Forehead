@@ -28,10 +28,12 @@ class Stroke(models.Model):
     distance = models.IntegerField()
     start_coordinate = models.JSONField()
     end_coordinate = models.JSONField(null = True)
-    hole_stats = models.ForeignKey(HoleStats, on_delete=models.CASCADE)
+    penalty = models.BooleanField()
+    rnd = models.ForeignKey(Round, on_delete=models.CASCADE)
+    hole = models.ForeignKey(Hole, on_delete=models.CASCADE)
 
 class Putt(models.Model):
     stroke_number = models.IntegerField()
     distance = models.IntegerField()
-    hole_stats = models.ForeignKey(HoleStats, on_delete=models.CASCADE)
-
+    rnd = models.ForeignKey(Round, on_delete=models.CASCADE)
+    hole = models.ForeignKey(Hole, on_delete=models.CASCADE)

@@ -3,7 +3,8 @@ import type { PuttData } from "./PuttData";
 import type { StrokeData } from "./StrokeData";
 
 export interface HoleScore {
-    score?: number;
+    numberOfStrokes?: number;
+    numberOfPutts?: number;
     roundId?: number;
     stats: HoleStatsData;
     strokes: StrokeData[];

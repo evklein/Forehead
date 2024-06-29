@@ -2,6 +2,9 @@ import * as apiHelpers from "./apiHelpers";
 import type { CourseData } from "../models/CourseData";
 import type { HoleData } from "../models/HoleData";
 import type { TeeData } from "../models/TeeData";
+import type { PuttData } from "../models/PuttData";
+import type { StrokeData } from "../models/StrokeData";
+import type { HoleStatsData } from "../models/HoleStatsData";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -157,6 +160,46 @@ export async function fetchTees(courseId: number) {
             });
         }
         return tees;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function saveHoleStats(roundId: number, holeId: number, stats: HoleStatsData) {
+    const endpoint = `/round/${roundId}/hole/${holeId}/new/`;
+    let requestBody: string = JSON.stringify({
+
+    });
+    try {
+        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function saveStroke(roundId: number, holeId: number, stroke: StrokeData) {
+    const endpoint = `/round/${roundId}/hole/${holeId}/strokes/new/`;
+    let requestBody: string = JSON.stringify({
+
+    });
+    try {
+        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function savePutt(roundId: number, holeId: number, putt: PuttData) {
+    const endpoint = `/round/${roundId}/hole/${holeId}/putts/new/`;
+    let requestBody: string = JSON.stringify({
+        distance: 10,
+        stroke_number: 1,
+    });
+    try {
+        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
