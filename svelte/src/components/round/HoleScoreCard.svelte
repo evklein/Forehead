@@ -4,10 +4,12 @@
     import type { HoleScore } from "../../models/HoleScore";
     import * as geo from "../../services/geo";
     import * as api from "../../services/api";
+    import type { CourseData } from "../../models/CourseData";
+    import type { RoundData } from "../../models/RoundData";
 
     // Props
-    export let courseName: string;
-    export let maximumNumberOfHoles: number;
+    export let course: CourseData;
+    export let round: RoundData;
     export let hole: HoleData;
     export let holeScore: HoleScore;
     export let handleGoToNextHole: Function;
@@ -38,14 +40,22 @@
 
     async function saveAll() {
         // Save Hole Stats
+        if (round.id && hole.id) {
+            await api.saveHoleStats(round.id, hole.id, holeScore.stats);
+        }
         
         // Save strokes
+        holeScore.strokes.forEach(async stroke => {
+            if (round.id && hole.id) {
+                await api.saveStroke(round.id, hole.id, stroke);
+            }
+        });
 
-        // Save putts
-        for (let i = 0; i < holeScore.putts.length; i++) {
-            let nextPutt = holeScore.putts[i];
-            await api.savePutt(2, 1, nextPutt);
-        }
+        holeScore.putts.forEach(async putt => {
+            if (round.id && hole.id) {
+                await api.savePutt(round.id, hole.id, putt);
+            }
+        });
     }
 
     async function saveAndGoToNext() {

@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("new/", views.saveNewRound, name="saveNewRound"),
     path("<int:round_id>/", views.fetchRound, name="fetchRound"),
     path("<int:round_id>/holes/", views.fetchAllHoleStatsForRound, name="fetchAllHoleStatsForRound"),
     path("<int:round_id>/hole/<int:hole_id>/", views.fetchHoleStats, name="fetchHoleStats"),

@@ -1,12 +1,15 @@
 export interface RoundData {
-    courseId?: number;
+    id?: number;
+    nickname?: string;
     datePlayed?: Date;
     teeTime?: string;
     finishTime?: string;
     holesCompleted?: number;
-    playedTeeId?: number;
     groupMakeup?: string;
     mobility?: string;
-    roundCountsTowardHandicapIndex?: boolean;
+    roundCountsTowardHci?: boolean;
     notes?: string;
+
+    playedTeeId?: number;
+    courseId?: number;
 }

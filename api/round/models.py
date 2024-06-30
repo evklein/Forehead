@@ -4,16 +4,16 @@ from course.models import Course, Tee, Hole
 
 class Round(models.Model):
     nickname = models.CharField(max_length = 200, null=True, blank=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date_played = models.DateField()
     tee_time = models.CharField(max_length = 50, null=True, blank=True)
     finish_time = models.CharField(max_length = 50, null=True, blank=True)
     holes_completed = models.IntegerField()
-    played_tee = models.ForeignKey(Tee, on_delete=models.CASCADE)
     group_makeup = models.CharField(max_length = 50, null=True, blank=True)
     mobility = models.CharField(max_length = 50, null=True, blank=True)
     round_counts_toward_hci = models.BooleanField()
     notes = models.CharField(max_length = 5000, null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    played_tee = models.ForeignKey(Tee, on_delete=models.CASCADE)
 
 class HoleStats(models.Model):
     gir = models.BooleanField()

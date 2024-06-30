@@ -24,6 +24,7 @@
     let round: RoundData = {
         datePlayed: new Date(),
         mobility: "Walking",
+        roundCountsTowardHci: false,
     };
 
     let holeScores: HoleScore[];
@@ -55,8 +56,9 @@
 </script>
 {#if entryStage === RoundStage.Start}
     <RoundStart
-        courseName={course?.name}
-        bind:round {tees} 
+        {course}
+        bind:round
+        {tees} 
         handleAdvance={() => entryStage = RoundStage.HoleEntry} />
 {:else if entryStage === RoundStage.HoleEntry}
     <HoleEntry courseName={course.name}

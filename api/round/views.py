@@ -5,14 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import Round, HoleStats, Stroke, Putt
-from course.models import Hole
+from course.models import Course, Hole, Tee
 
 def index(request):
     return HttpResponse("Hello, world. You're at the rounds index.")
 
 def fetchRound(request, round_id):
     round = Round.objects.get(pk=round_id)
-    # include_hole_score_objects = request.GET.get('includeHoleScoreObjs', False)
     raw_data = serializers.serialize('json', [round], ensure_ascii=False)
     trimmed_data = raw_data[1:-1]
     return HttpResponse(trimmed_data, content_type='application/json')
@@ -39,11 +38,18 @@ def fetchHolePutts(request, round_id, hole_id):
     return HttpResponse(raw_data, content_type='application/json')
 
 @csrf_exempt
-def saveRound(request):
+def saveNewRound(request):
     if request.method == 'POST':
         try:
+            course_id = request.GET.get('course_id', -1)
+            print("COURSE ID")
+            print(course_id)
+            course = Course.objects.get(pk=course_id)
+            tee_id = request.GET.get('tee_id', -1)
+            tee = Tee.objects.get(pk=tee_id)
+
             data = json.loads(request.body)
-            round = Round()
+            round = Round(course=course, played_tee=tee)
             for key, value in data.items():
                 setattr(round, key, value)
             

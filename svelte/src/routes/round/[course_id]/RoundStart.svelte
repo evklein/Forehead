@@ -1,20 +1,29 @@
 <script lang="ts">
-    import type { EventHandler } from "svelte/elements";
     import type { RoundData } from "../../../models/RoundData";
     import type { TeeData } from "../../../models/TeeData";
-    import { RoundStage } from "../RoundStage";
+    import * as api from "../../../services/api";
+    import type { CourseData } from "../../../models/CourseData";
 
-    export let courseName: string;
+    export let course: CourseData;
     export let round: RoundData;
     export let tees: TeeData[];
-    export let handleAdvance: EventHandler;
+    export let handleAdvance: Function;
+
+    let selectedTee: TeeData;
+
+    async function advance() {
+        console.log("SAVING: " + course.name + " " + selectedTee.name);
+        console.log(round);
+        await api.saveRound(round, course.courseId, selectedTee.id);
+        handleAdvance();
+    }
 </script>
 <div class="row align-items-start">
     <div class="card">
         <div class="card-body">
             <h3 class="card-title">
                 New Round
-                <span class="course-detail"> // {courseName}</span>
+                <span class="course-detail"> // {course?.name}</span>
                 <span class="date-detail">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="date-addon"
@@ -82,10 +91,11 @@
                             class="form-select"
                             id="floatingSelect"
                             aria-label="Floating label select example"
+                            bind:value={selectedTee}
                         >
                             <option selected>Tee</option>
                             {#each tees as tee}
-                                <option>
+                                <option value={tee}>
                                     {tee.name}
                                 </option>
                             {/each}
@@ -134,7 +144,7 @@
                             class="form-check-input"
                             type="checkbox"
                             id="flexCheckDefault"
-                            bind:value={round.roundCountsTowardHandicapIndex}
+                            bind:value={round.roundCountsTowardHci}
                         />
                         <label class="form-check-label" for="flexCheckDefault">
                             Round counts toward Handicap Index
@@ -156,7 +166,7 @@
                     </div>
                 </div>
                 <div class="card-buttons">
-                    <button class="btn btn-success" on:click={handleAdvance}>
+                    <button class="btn btn-success" on:click={advance}>
                         <i class="fa-solid fa-arrow-right"></i> Start Round
                     </button>
                 </div>

@@ -5,6 +5,7 @@ import type { TeeData } from "../models/TeeData";
 import type { PuttData } from "../models/PuttData";
 import type { StrokeData } from "../models/StrokeData";
 import type { HoleStatsData } from "../models/HoleStatsData";
+import type { RoundData } from "../models/RoundData";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -160,6 +161,27 @@ export async function fetchTees(courseId: number) {
             });
         }
         return tees;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function saveRound(roundData: RoundData, courseId: number, teeId: number) {
+    const endpoint = `/round/new/?course_id=${courseId}&tee_id=${teeId}`;
+    let requestBody: string = JSON.stringify({
+        nickname: roundData.nickname,
+        date_played: roundData.datePlayed?.toISOString().split('T')[0],
+        tee_time: roundData.teeTime,
+        finish_time: roundData.finishTime,
+        holes_completed: roundData.holesCompleted,
+        group_makeup: roundData.groupMakeup,
+        mobility: roundData.mobility,
+        round_counts_toward_hci: roundData.roundCountsTowardHci,
+        notes: roundData.notes
+    });
+    try {
+        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
