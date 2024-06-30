@@ -93,6 +93,7 @@ export async function fetchHoles(courseId: number): Promise<HoleData[]> {
                 par: nextHoleData['fields']['par'],
                 boundPoints: nextHoleData['fields']['bound_points'] ?? [],
                 centerGreenPoint: JSON.parse(nextHoleData['fields']['center_green_point']),
+                id: nextHoleData['pk']
             });
         }
         return holes;
@@ -167,7 +168,7 @@ export async function fetchTees(courseId: number) {
     }
 }
 
-export async function saveRound(roundData: RoundData, courseId: number, teeId: number) {
+export async function saveRound(roundData: RoundData, courseId: number, teeId: number): Promise<number> {
     const endpoint = `/round/new/?course_id=${courseId}&tee_id=${teeId}`;
     let requestBody: string = JSON.stringify({
         nickname: roundData.nickname,
@@ -181,18 +182,24 @@ export async function saveRound(roundData: RoundData, courseId: number, teeId: n
         notes: roundData.notes
     });
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        let response = await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        return response['round_id'];
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
+        return -1;
     }
 }
 
 export async function saveHoleStats(roundId: number, holeId: number, stats: HoleStatsData) {
     const endpoint = `/round/${roundId}/hole/${holeId}/new/`;
+    console.log("saving");
     let requestBody: string = JSON.stringify({
-
+        gir: stats.greenInRegulation,
+        gld: stats.greenLightDrive,
+        scrambling: stats.scrambling,
     });
+    console.log(requestBody)
     try {
         await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
     } catch (error) {
@@ -204,7 +211,11 @@ export async function saveHoleStats(roundId: number, holeId: number, stats: Hole
 export async function saveStroke(roundId: number, holeId: number, stroke: StrokeData) {
     const endpoint = `/round/${roundId}/hole/${holeId}/strokes/new/`;
     let requestBody: string = JSON.stringify({
-
+        stroke_number: stroke.strokeNumber,
+        club: stroke.club,
+        penalty: stroke.penalty,
+        start_coordinate: stroke.startCoordinate,
+        end_coordinate: stroke.endCoordinate,
     });
     try {
         await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
@@ -222,6 +233,71 @@ export async function savePutt(roundId: number, holeId: number, putt: PuttData) 
     });
     try {
         await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function getHoleStatsForRound(roundId: number) {
+    const endpoint = `/round/${roundId}/stats/`;
+    try {
+        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        let stats: HoleStatsData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextStatData = rawData[i];
+            stats.push({
+                holeNumber: nextStatData['fields']['hole'],
+                greenInRegulation: nextStatData['fields']['gir'],
+                greenLightDrive: nextStatData['fields']['gld'],
+                scrambling: nextStatData['fields']['scrambling'],
+            });
+        }
+        return stats;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function getStrokesForRound(roundId: number) {
+    const endpoint = `/round/${roundId}/strokes/`;
+    try {
+        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        let strokes: StrokeData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextStroke = rawData[i];
+            strokes.push({
+                strokeNumber: nextStroke['fields']['stroke_number'],
+                club: nextStroke['fields']['club'],
+                distance: nextStroke['fields']['distance'],
+                startCoordinate: nextStroke['fields']['start_coordinate'],
+                endCoordinate: nextStroke['fields']['end_coordinate'],
+                penalty: nextStroke['fields']['penalty'],
+                holeNumber: nextStroke['fields']['hole']
+            });
+        }
+        return strokes;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
+export async function getPuttsForRound(roundId: number) {
+    const endpoint = `/round/${roundId}/putts/`;
+    try {
+        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        let putts: PuttData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextPutt = rawData[i];
+            putts.push({
+                strokeNumber: nextPutt['fields']['stroke_number'],
+                distance: nextPutt['fields']['distance'],
+                holeNumber: nextPutt['fields']['hole']
+            });
+        }
+        return putts;
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);

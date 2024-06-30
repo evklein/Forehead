@@ -14,7 +14,7 @@
     async function advance() {
         console.log("SAVING: " + course.name + " " + selectedTee.name);
         console.log(round);
-        await api.saveRound(round, course.courseId, selectedTee.id);
+        round.id = await api.saveRound(round, course.courseId, selectedTee.id);
         handleAdvance();
     }
 </script>

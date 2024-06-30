@@ -4,7 +4,7 @@ export interface RoundData {
     datePlayed?: Date;
     teeTime?: string;
     finishTime?: string;
-    holesCompleted?: number;
+    holesCompleted: number;
     groupMakeup?: string;
     mobility?: string;
     roundCountsTowardHci?: boolean;

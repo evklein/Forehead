@@ -14,7 +14,7 @@
     export let holeScore: HoleScore;
     export let handleGoToNextHole: Function;
     export let handleGoToPreviousHole: Function;
-    export let handleAdvance: EventHandler;
+    export let handleAdvance: Function;
     export let selectedPoints: [number, number][];
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
@@ -24,9 +24,10 @@
         holeScore.putts = [];
 
         if (holeScore.numberOfStrokes && holeScore.numberOfPutts) {
-            for (let i = 0; i < holeScore.numberOfStrokes; i++) {
+            for (let i = 0; i < holeScore.numberOfStrokes - holeScore.numberOfPutts; i++) {
                 holeScore.strokes.push({
-                    strokeNumber: i + 1,                
+                    strokeNumber: i + 1,
+                    penalty: false,
                 });
             }
     
@@ -39,20 +40,29 @@
     }
 
     async function saveAll() {
+        console.log(holeScore);
+        console.log(round);
+        console.log(hole);
         // Save Hole Stats
         if (round.id && hole.id) {
+            console.log('Saving stats');
+            console.log(holeScore.stats);
             await api.saveHoleStats(round.id, hole.id, holeScore.stats);
         }
-        
-        // Save strokes
+
+        let nextSelectedPointIndex = 0;
         holeScore.strokes.forEach(async stroke => {
             if (round.id && hole.id) {
+                stroke.startCoordinate = selectedPoints[nextSelectedPointIndex];
+                stroke.endCoordinate = selectedPoints[nextSelectedPointIndex + 1];
+                stroke.distance = geo.getDistanceFromLatLonInYards(stroke.startCoordinate[0], stroke.startCoordinate[1], stroke.endCoordinate[0], stroke.endCoordinate[1]);
                 await api.saveStroke(round.id, hole.id, stroke);
             }
         });
 
         holeScore.putts.forEach(async putt => {
             if (round.id && hole.id) {
+                console.log('Saving putts');
                 await api.savePutt(round.id, hole.id, putt);
             }
         });
@@ -61,19 +71,31 @@
     async function saveAndGoToNext() {
         console.log('Saving!');
         await saveAll();
-        handleGoToPreviousHole();
+        handleGoToNextHole();
+        console.log(hole.holeNumber);
+        console.log(round.holesCompleted);
     }
 
     async function saveAndGoToPrevious() {
         await saveAll();
-        handleGoToNextHole();
+        handleGoToPreviousHole();
+    }
+
+    async function advance() {
+        await saveAll();
+        handleAdvance();
+    }
+
+    function clicker() {
+        console.log("click");
+        console.log(holeScore.stats);
     }
 </script>
 {#if holeScore}
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">
-            <span class="card-title-emphasize">Hole {hole?.holeNumber}</span> // {courseName}
+            <span class="card-title-emphasize">Hole {hole?.holeNumber}</span> // {course.name}
             <span class="par-badge badge text-bg-success">Par {hole?.par}</span>
         </h5>
         <p class="approximate-yardage">
@@ -111,17 +133,23 @@
                                 aria-label="putts">
                         </td>
                         <td class="td-20">
-                            <input class="score-checkbox form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <input class="score-checkbox form-check-input"
+                                type="checkbox"
+                                on:click={clicker}
+                                bind:checked={holeScore.stats.greenInRegulation}>
                         </td>
                         <td class="td-20">
-                            <input class="score-checkbox form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <input class="score-checkbox form-check-input"
+                                type="checkbox"
+                                bind:checked={holeScore.stats.greenLightDrive}>
                         </td>
                         <td class="td-20">
                             {#if holeScore.stats && holeScore.stats.greenInRegulation}
-                                <input class="score-checkbox form-check-input"
-                                        type="checkbox" value="" id="flexCheckDefault">
-                            {:else}
                                 <span class="disabled-checkbox-placeholder">-</span>
+                            {:else}
+                                <input class="score-checkbox form-check-input"
+                                    type="checkbox"
+                                    bind:checked={holeScore.stats.scrambling}>
                             {/if}
                         </td>
                     </tr>
@@ -141,7 +169,7 @@
                 </thead>
                 <tbody>
                     {#if holeScore?.strokes && holeScore?.putts}
-                        {#each {length: holeScore.strokes.length - holeScore.putts.length} as _, strokeNumber}
+                        {#each {length: holeScore.strokes.length} as _, strokeNumber}
                             <tr>
                                 <td>{strokeNumber + 1}</td>
                                 <td>
@@ -149,10 +177,11 @@
                                         class="form-select"
                                         id="floatingSelect"
                                         aria-label="club-select"
+                                        bind:value={holeScore.strokes[strokeNumber].club}
                                     >
                                         <option selected>Club</option>
                                         {#each clubs as club}
-                                            <option>
+                                            <option value={club}>
                                                 {club}
                                             </option>
                                         {/each}
@@ -222,8 +251,8 @@
                     class="btn btn-success">
                     <i class="fa-solid fa-arrow-left"></i> Previous
                 </a>
-            {/if}                
-            {#if hole?.holeNumber !== maximumNumberOfHoles}
+            {/if}
+            {#if hole?.holeNumber < round.holesCompleted}
                 <a href="/"
                     on:click|preventDefault={saveAndGoToNext}
                     class="btn btn-success">
@@ -231,7 +260,7 @@
                 </a>
             {:else}
                 <a href="/"
-                    on:click|preventDefault={handleAdvance}
+                    on:click|preventDefault={advance}
                     class="btn btn-success">
                     <i class="fa-solid fa-check"></i> Finish Round
                 </a>

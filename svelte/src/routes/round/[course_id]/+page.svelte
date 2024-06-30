@@ -11,6 +11,9 @@
     import { page } from "$app/stores";
     import type { CourseData } from "../../../models/CourseData";
     import type { HoleScore } from "../../../models/HoleScore";
+    import type { HoleStatsData } from "../../../models/HoleStatsData";
+    import type { PuttData } from "../../../models/PuttData";
+    import type { StrokeData } from "../../../models/StrokeData";
 
     $: params = $page.params;
     $: courseId = Number(params.course_id);
@@ -25,9 +28,14 @@
         datePlayed: new Date(),
         mobility: "Walking",
         roundCountsTowardHci: false,
+        holesCompleted: 0,
     };
 
     let holeScores: HoleScore[];
+
+    let roundStats: HoleStatsData[];
+    let roundStrokes: StrokeData[];
+    let roundPutts: PuttData[];
 
     onMount(async () => {
         let courseDetails = await api.fetchCourseDetails(courseId);
@@ -35,8 +43,8 @@
             course = courseDetails;
             round.holesCompleted = course.numberOfHoles;
         }
-        tees = await api.fetchTees(1) ?? [];
-        holes = await api.fetchHoles(1);
+        tees = await api.fetchTees(course.courseId) ?? [];
+        holes = await api.fetchHoles(course.courseId);
 
         if (course && course.numberOfHoles) {
             holeScores = Array.from({ length: course.numberOfHoles }, (_, index) => {
@@ -53,6 +61,16 @@
             });
         }
     });
+
+    async function advanceToFinalizePage() {
+        if (round.id) {
+            roundStats = await api.getHoleStatsForRound(round.id) ?? [];
+            roundStrokes = await api.getStrokesForRound(round.id) ?? [];
+            roundPutts = await api.getPuttsForRound(round.id) ?? [];
+        }
+
+        entryStage = RoundStage.Finalize;
+    }
 </script>
 {#if entryStage === RoundStage.Start}
     <RoundStart
@@ -61,13 +79,21 @@
         {tees} 
         handleAdvance={() => entryStage = RoundStage.HoleEntry} />
 {:else if entryStage === RoundStage.HoleEntry}
-    <HoleEntry courseName={course.name}
-        maximumNumberOfHoles={course.numberOfHoles}
+    <HoleEntry
+        {round}
+        {course}
         {holes}
         {holeScores}
-        handleAdvance={() => entryStage = RoundStage.Finalize} />
+        handleAdvance={advanceToFinalizePage} />
 {:else if entryStage === RoundStage.Finalize}
-    <Finalize />
+    <Finalize
+        {course}
+        {round}
+        {holes}
+        stats={roundStats}
+        strokes={roundStrokes}
+        putts={roundPutts}
+    />
 {/if}
 <style>
 </style>

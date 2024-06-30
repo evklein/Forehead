@@ -6,4 +6,5 @@ export interface StrokeData {
     endCoordinate?: [number, number];
     roundId?: number;
     holeNumber?: number;
+    penalty?: boolean;
 }

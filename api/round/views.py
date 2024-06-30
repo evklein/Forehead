@@ -37,6 +37,21 @@ def fetchHolePutts(request, round_id, hole_id):
     raw_data = serializers.serialize('json', putts)
     return HttpResponse(raw_data, content_type='application/json')
 
+def fetchRoundHoleStats(request, round_id):
+    stats = HoleStats.objects.filter(rnd=round_id)
+    raw_data = serializers.serialize('json', stats)
+    return HttpResponse(raw_data, content_type='application/json')
+
+def fetchRoundStrokes(request, round_id):
+    strokes = Stroke.objects.filter(rnd=round_id)
+    raw_data = serializers.serialize('json', strokes)
+    return HttpResponse(raw_data, content_type='application/json')
+
+def fetchRoundPutts(request, round_id):
+    putts = Putt.objects.filter(rnd=round_id)
+    raw_data = serializers.serialize('json', putts)
+    return HttpResponse(raw_data, content_type='application/json')
+
 @csrf_exempt
 def saveNewRound(request):
     if request.method == 'POST':
@@ -55,7 +70,7 @@ def saveNewRound(request):
             
             round.save()
 
-            return JsonResponse({'message': 'Data saved successfully'})
+            return JsonResponse({'message': 'Data saved successfully', 'round_id': round.id})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:
@@ -69,9 +84,16 @@ def saveHoleStats(request, round_id, hole_id):
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
             stats = HoleStats(rnd=rnd, hole=hole)
+            print("SAVING NEW HOLE STATS")
             for key, value in data.items():
-                setattr(stats, key, value)
+                sanitized_val = value
+                if value == 'true':
+                    sanitized_val = True
+                elif value == 'false':
+                    sanitized_val = False
+                setattr(stats, key, sanitized_val)
             
+            print("SAVING NEW HOLE STATS - done")
             stats.save()
 
             return JsonResponse({'message': 'Data saved successfully'})

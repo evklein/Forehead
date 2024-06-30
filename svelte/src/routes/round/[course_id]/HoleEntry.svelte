@@ -7,9 +7,11 @@
     import Map from "../../../components/shared/Map.svelte";
     import InputDirector from "../../../components/round/InputDirector.svelte";
     import { MapMarkerChoice } from "../../../components/shared/MapMarkerChoice";
+    import type { CourseData } from "../../../models/CourseData";
+    import type { RoundData } from "../../../models/RoundData";
 
-    export let courseName: string;
-    export let maximumNumberOfHoles: number;
+    export let round: RoundData;
+    export let course: CourseData;
     export let holes: HoleData[];
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
@@ -81,9 +83,8 @@
         {/if}
     </div>
     <div class="col-6">
-        <HoleScoreCard {courseName}
+        <HoleScoreCard {round} {course}
             bind:hole={currentHole}
-            {maximumNumberOfHoles}
             bind:holeScore={currentHoleScore}
             handleGoToNextHole={incrementCurrentHoleNumber}
             handleGoToPreviousHole={decrementCurrentHoleNumber}

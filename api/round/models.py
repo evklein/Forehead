@@ -25,8 +25,7 @@ class HoleStats(models.Model):
 class Stroke(models.Model):
     stroke_number = models.IntegerField()
     club = models.CharField(max_length = 50)
-    distance = models.IntegerField()
-    start_coordinate = models.JSONField()
+    start_coordinate = models.JSONField(null = True)
     end_coordinate = models.JSONField(null = True)
     penalty = models.BooleanField()
     rnd = models.ForeignKey(Round, on_delete=models.CASCADE)
