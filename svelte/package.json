@@ -1,6 +1,9 @@
 {
 	"name": "bonk-site",
 	"version": "0.0.1",
+    "engines": {
+        "node": ">=18.13"
+    },
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
