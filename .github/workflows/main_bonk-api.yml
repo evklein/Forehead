@@ -16,9 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      -name: cd into API
-        run: |
-          cd api
+      - name: cd into API
+        run: cd api
 
       - name: Set up Python version
         uses: actions/setup-python@v1
