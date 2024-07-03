@@ -21,6 +21,7 @@ jobs:
           pwd
           cd api
           pwd
+          ls
 
       - name: Set up Python version
         uses: actions/setup-python@v1
