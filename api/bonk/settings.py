@@ -15,6 +15,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+print("BASE_DIR: " + str(BASE_DIR))
 
 
 # Quick-start development settings - unsuitable for production
@@ -83,7 +84,8 @@ WSGI_APPLICATION = 'bonk.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/home/site/wwwroot/db/db.sqlite3',
     }
 }
 
