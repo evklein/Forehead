@@ -13,15 +13,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
 
     steps:
       - uses: actions/checkout@v4
-      - name: cd into API
-        run: |
-          pwd
-          cd api
-          pwd
-          ls
 
       - name: Set up Python version
         uses: actions/setup-python@v1
@@ -43,7 +40,6 @@ jobs:
           pwd
           ls
           zip release.zip ./* -r
-          ls
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
