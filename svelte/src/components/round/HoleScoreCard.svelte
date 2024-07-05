@@ -3,7 +3,7 @@
     import type { HoleData } from "../../models/HoleData";
     import type { HoleScore } from "../../models/HoleScore";
     import * as geo from "../../services/geo";
-    import * as api from "../../services/api";
+    import * as api from "../../services/api
     import type { CourseData } from "../../models/CourseData";
     import type { RoundData } from "../../models/RoundData";
 

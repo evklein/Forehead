@@ -7,12 +7,14 @@ import type { StrokeData } from "../models/StrokeData";
 import type { HoleStatsData } from "../models/HoleStatsData";
 import type { RoundData } from "../models/RoundData";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const BONK_API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchAllCourses(): Promise<CourseData[] | null> {
+    console.log('AHHHh');
+    console.log(BONK_API_URL);
     const endpoint = `/course/all`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         let courses: CourseData[] = [];
         for (let i = 0; i < rawData.length; i++) {
             let nextCourse = rawData[i];
@@ -39,7 +41,7 @@ export async function fetchAllCourses(): Promise<CourseData[] | null> {
 export async function fetchCourseDetails(id: number): Promise<CourseData | null> {
     const endpoint = `/course/${id}/details/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         const course: CourseData = {
             courseId: rawData['pk'],
             name: rawData['fields']['name'],
@@ -73,7 +75,7 @@ export async function saveCourse(id: number, course: CourseData) {
     });
 
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
@@ -83,7 +85,7 @@ export async function saveCourse(id: number, course: CourseData) {
 export async function fetchHoles(courseId: number): Promise<HoleData[]> {
     const endpoint = `/course/${courseId}/holes/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         let holes: HoleData[] = [];
         for (let i = 0; i < rawData.length; i++) {
             let nextHoleData = rawData[i];
@@ -107,7 +109,7 @@ export async function fetchHoles(courseId: number): Promise<HoleData[]> {
 export async function fetchHoleDetails(courseId: number, holeNumber: number): Promise<HoleData> {
     const endpoint = `/course/${courseId}/hole/${holeNumber}`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         const hole: HoleData = {
             holeNumber: rawData['fields']['hole_number'],
             nickname: rawData['fields']['nickname'],
@@ -137,7 +139,7 @@ export async function saveHole(courseId: number, hole: HoleData) {
         center_green_point: hole.centerGreenPoint
     });
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
@@ -147,7 +149,7 @@ export async function saveHole(courseId: number, hole: HoleData) {
 export async function fetchTees(courseId: number) {
     const endpoint = `/course/${courseId}/tees/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         
         let tees: TeeData[] = [];
         for (let i = 0; i < rawData.length; i++) {
@@ -182,7 +184,7 @@ export async function saveRound(roundData: RoundData, courseId: number, teeId: n
         notes: roundData.notes
     });
     try {
-        let response = await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        let response = await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
         return response['round_id'];
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
@@ -201,7 +203,7 @@ export async function saveHoleStats(roundId: number, holeId: number, stats: Hole
     });
     console.log(requestBody)
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
@@ -218,7 +220,7 @@ export async function saveStroke(roundId: number, holeId: number, stroke: Stroke
         end_coordinate: stroke.endCoordinate,
     });
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
@@ -232,7 +234,7 @@ export async function savePutt(roundId: number, holeId: number, putt: PuttData) 
         stroke_number: 1,
     });
     try {
-        await apiHelpers.post(API_BASE_URL, endpoint, requestBody);
+        await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);
@@ -242,7 +244,7 @@ export async function savePutt(roundId: number, holeId: number, putt: PuttData) 
 export async function getHoleStatsForRound(roundId: number) {
     const endpoint = `/round/${roundId}/stats/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         let stats: HoleStatsData[] = [];
         for (let i = 0; i < rawData.length; i++) {
             let nextStatData = rawData[i];
@@ -263,7 +265,7 @@ export async function getHoleStatsForRound(roundId: number) {
 export async function getStrokesForRound(roundId: number) {
     const endpoint = `/round/${roundId}/strokes/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         let strokes: StrokeData[] = [];
         for (let i = 0; i < rawData.length; i++) {
             let nextStroke = rawData[i];
@@ -287,7 +289,7 @@ export async function getStrokesForRound(roundId: number) {
 export async function getPuttsForRound(roundId: number) {
     const endpoint = `/round/${roundId}/putts/`;
     try {
-        const rawData: any = await apiHelpers.get(API_BASE_URL, endpoint);
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
         let putts: PuttData[] = [];
         for (let i = 0; i < rawData.length; i++) {
             let nextPutt = rawData[i];

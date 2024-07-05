@@ -32,6 +32,8 @@ CSRF_TRUSTED_ORIGINS = []
 if 'WEBSITE_HOSTNAME' in os.environ:
     ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']]
     CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+if 'PROD_WEBAPP_URL' in os.environ:
+    CSRF_TRUSTED_ORIGINS += [os.environ['PROD_WEBAPP_URL']]
 
 # Application definition
 
@@ -63,7 +65,10 @@ MIDDLEWARE = [
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
+if 'PROD_WEBAPP_URL' in os.environ:
+    CORS_ALLOWED_ORIGINS += [os.environ['PROD_WEBAPP_URL']]
+
 
 ROOT_URLCONF = 'bonk.urls'
 
