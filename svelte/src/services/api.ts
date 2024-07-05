@@ -7,7 +7,7 @@ import type { StrokeData } from "../models/StrokeData";
 import type { HoleStatsData } from "../models/HoleStatsData";
 import type { RoundData } from "../models/RoundData";
 
-const BONK_API_URL = import.meta.env.VITE_API_URL;
+const BONK_API_URL = import.meta.env.VITE_BONK_API_URL ?? "http://localhost:8000";
 
 export async function fetchAllCourses(): Promise<CourseData[] | null> {
     console.log('AHHHh');
