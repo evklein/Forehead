@@ -12,6 +12,7 @@ class Round(models.Model):
     mobility = models.CharField(max_length = 50, null=True, blank=True)
     round_counts_toward_hci = models.BooleanField()
     notes = models.CharField(max_length = 5000, null=True, blank=True)
+    in_progress = models.BooleanField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     played_tee = models.ForeignKey(Tee, on_delete=models.CASCADE)
 
@@ -27,7 +28,7 @@ class Stroke(models.Model):
     club = models.CharField(max_length = 50)
     start_coordinate = models.JSONField(null = True)
     end_coordinate = models.JSONField(null = True)
-    penalty = models.BooleanField()
+    penalty = models.BooleanField(null = True)
     rnd = models.ForeignKey(Round, on_delete=models.CASCADE)
     hole = models.ForeignKey(Hole, on_delete=models.CASCADE)
 

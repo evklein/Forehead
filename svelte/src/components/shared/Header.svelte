@@ -6,7 +6,7 @@
                 </h1>
             </a>
         <div class="header-links">
-            <a href="/courses">Courses</a>
+            <a href="/rounds">Rounds</a>
             <a href="/practice">Practice</a>
         </div>
     </div>
