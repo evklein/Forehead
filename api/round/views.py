@@ -67,6 +67,7 @@ def saveNewRound(request):
             round = Round(course=course, played_tee=tee)
             for key, value in data.items():
                 setattr(round, key, value)
+            round.in_progress = True
             
             round.save()
 

@@ -181,7 +181,7 @@ export async function saveRound(roundData: RoundData, courseId: number, teeId: n
         group_makeup: roundData.groupMakeup,
         mobility: roundData.mobility,
         round_counts_toward_hci: roundData.roundCountsTowardHci,
-        notes: roundData.notes
+        notes: roundData.notes,
     });
     try {
         let response = await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
