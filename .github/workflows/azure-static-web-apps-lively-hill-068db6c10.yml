@@ -32,6 +32,8 @@ jobs:
           api_location: "build/server" # Api source code path - optional
           output_location: "build/static" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+        env:
+          VITE_BONK_API_URL: ${{ secrets.VITE_BONK_API_URL }} # https://learn.microsoft.com/en-us/azure/static-web-apps/build-configuration?tabs=github-actions#environment-variables
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
