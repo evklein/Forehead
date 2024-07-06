@@ -23,3 +23,23 @@ def savePracticeStroke(request):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+
+@csrf_exempt
+def savePracticeGame(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            game = PracticeGame()
+            for key, value in data.items():
+                setattr(game, key, value)
+            
+            game.save()
+            
+            return JsonResponse({'message': 'Data saved successfully'})
+        except Course.DoesNotExist:
+            return JsonResponse({'error': 'Course not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)

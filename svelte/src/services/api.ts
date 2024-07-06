@@ -7,6 +7,7 @@ import type { StrokeData } from "../models/StrokeData";
 import type { HoleStatsData } from "../models/HoleStatsData";
 import type { RoundData } from "../models/RoundData";
 import type { PracticeStrokeData } from "../models/PracticeStrokeData";
+import type { ScrambleGameData } from "../models/ScrambleGameData";
 
 const BONK_API_URL = import.meta.env.VITE_BONK_API_URL ?? "http://localhost:8000";
 
@@ -317,6 +318,21 @@ export async function savePracticeStroke(practiceStroke: PracticeStrokeData) {
         result_distance: practiceStroke.resultDistance,
         result_shape_direction: practiceStroke.resultShapeDirection,
         result_shape: practiceStroke.resultShape,
+    });
+    try {
+        let response = await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return -1;
+    }
+}
+
+export async function savePracticeGame(practiceGame: ScrambleGameData) {
+    const endpoint = `/practice/game/`;
+    let requestBody: string = JSON.stringify({
+        game_type: "scramble",
+        game_data: JSON.stringify(practiceGame)
     });
     try {
         let response = await apiHelpers.post(BONK_API_URL, endpoint, requestBody);
