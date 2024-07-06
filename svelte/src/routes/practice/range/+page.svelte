@@ -93,6 +93,10 @@
         };
     }
 
+    function skipShot() {
+        goToNextShot();
+    }
+
     async function saveShot() {
         await api.savePracticeStroke(currentShotData);
         clearShotResults();
@@ -213,6 +217,7 @@
             {/if}
         </div>
         <div class="lower-buttons">
+            <button type="button" class="btn btn-lg btn-danger" on:click={skipShot}>Skip shot</button>
             <button type="button" class="btn btn-lg btn-primary" on:click={saveShot}>Save shot</button>
             <button type="button" class="btn btn-lg btn-success" on:click={saveAndGoToNextShot}>Save and next shot</button>
         </div>
