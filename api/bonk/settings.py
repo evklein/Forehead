@@ -40,6 +40,7 @@ if 'PROD_WEBAPP_URL' in os.environ:
 INSTALLED_APPS = [
     'course.apps.CourseConfig',
     'round.apps.RoundConfig',
+    'practice.apps.PracticeConfig',
     'corsheaders',
     'schema_viewer',
     'django.contrib.admin',
