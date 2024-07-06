@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import type { PracticeShotType } from "../../models/PracticeShot";
+    import type { PracticeStrokeData } from "../../models/PracticeStrokeData";
+    import * as api from "../../services/api";
 
     let shotTypes: PracticeShotType[] = [
         {
@@ -59,9 +61,10 @@
             showDistanceOptions: true,
             showShapeOptions: false
         },
-    ]
+    ];
 
     let currentShotType: PracticeShotType;
+    let currentShotData: PracticeStrokeData;
 
     onMount(() => {
         goToNextShot();
@@ -75,6 +78,28 @@
     function goToNextShot() {
         let randomIndex = Math.floor(Math.random() * shotTypes.length);
         currentShotType = shotTypes[randomIndex];
+        clearShotResults();
+    }
+
+    function clearShotResults() {
+        currentShotData = {
+            shotType: currentShotType.name,
+            shotDistance: getYardageForCurrentShot(),
+            misHit: 'None',
+            resultSide: '',
+            resultDistance: '',
+            resultShapeDirection: '',
+            resultShape: ''
+        };
+    }
+
+    async function saveShot() {
+        await api.savePracticeStroke(currentShotData);
+    }
+
+    async function saveAndGoToNextShot() {
+        await saveShot();
+        goToNextShot();
     }
 </script>
 <h1>Practice</h1>
@@ -92,27 +117,59 @@
                     <div class="selections row align-items-start">
                         <h4 class="selection-section-title">
                             <span class="badge bg-success">
+                                Mis-hit
+                            </span>
+                        </h4>
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-none-radio" value="None" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-none-radio">None</label>
+
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-top-radio" value="Top" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-top-radio">Top</label>
+    
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-fat-radio" value="Fat" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-fat-radio">Fat</label>
+    
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-thin-radio" value="Thin" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-thin-radio">Thin</label>
+
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-shank-radio" value="Shank" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-shank-radio">Shank</label>
+
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-whiff-radio" value="Whiff" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-whiff-radio">Whiff</label>
+
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-toe-radio" value="Toe" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-toe-radio">Toe</label>
+
+                            <input type="radio" class="btn-check btn-lg" name="mishit-radio" id="mishit-sky-radio" value="Sky" bind:group={currentShotData.misHit}>
+                            <label class="btn btn-outline-primary" for="mishit-sky-radio">Sky</label>
+                        </div>
+                    </div>
+                    <div class="selections row align-items-start">
+                        <h4 class="selection-section-title">
+                            <span class="badge bg-success">
                                 Landing
                             </span>
                         </h4>
                         <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="left-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="left-radio" value="Left" bind:group={currentShotData.resultSide}>
                             <label class="btn btn-outline-primary" for="left-radio">Left</label>
     
-                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="straight-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="straight-radio" value="Straight" bind:group={currentShotData.resultSide}>
                             <label class="btn btn-outline-primary" for="straight-radio">Straight</label>
     
-                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="right-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="line-radio" id="right-radio" value="Right" bind:group={currentShotData.resultSide}>
                             <label class="btn btn-outline-primary" for="right-radio">Right</label>
                         </div>
                         <div class="btn-group" role="group">
-                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="short-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="short-radio" value="Short" bind:group={currentShotData.resultDistance}>
                             <label class="btn btn-outline-primary" for="short-radio">Short</label>
     
-                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="on-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="on-radio" value="On" bind:group={currentShotData.resultDistance}>
                             <label class="btn btn-outline-primary" for="on-radio">On</label>
     
-                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="long-radio" autocomplete="off">
+                            <input type="radio" class="btn-check btn-lg" name="distance-radio" id="long-radio" value="Long" bind:group={currentShotData.resultDistance}>
                             <label class="btn btn-outline-primary" for="long-radio">Long</label>
                         </div>
                     </div>
@@ -124,29 +181,29 @@
                                 </span>
                             </h4>
                             <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="pull-radio" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="pull-radio" value="Pull" bind:group={currentShotData.resultShapeDirection}>
                                 <label class="btn btn-outline-primary" for="pull-radio">Pull</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="straight-radio-2" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="straight-radio-2" value="Straight" bind:group={currentShotData.resultShapeDirection}>
                                 <label class="btn btn-outline-primary" for="straight-radio-2">Straight</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="push-radio" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="direction-radio" id="push-radio" value="Push" bind:group={currentShotData.resultShapeDirection}>
                                 <label class="btn btn-outline-primary" for="push-radio">Push</label>
                             </div>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="hook-radio" autocomplete="off">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="hook-radio" value="Hook" bind:group={currentShotData.resultShape}>
                                 <label class="btn btn-outline-primary" for="hook-radio">Hook</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="draw-radio" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="draw-radio" value="Draw" bind:group={currentShotData.resultShape}>
                                 <label class="btn btn-outline-primary" for="draw-radio">Draw</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="straight-radio-3" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="straight-radio-3" value="Straight" bind:group={currentShotData.resultShape}>
                                 <label class="btn btn-outline-primary" for="straight-radio-3">Straight</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="fade-radio" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="fade-radio" value="Fade" bind:group={currentShotData.resultShape}>
                                 <label class="btn btn-outline-primary" for="fade-radio">Fade</label>
 
-                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="slice-radio" autocomplete="off">
+                                <input type="radio" class="btn-check btn-lg" name="shape-radio" id="slice-radio" value="Slice" bind:group={currentShotData.resultShape}>
                                 <label class="btn btn-outline-primary" for="slice-radio">Slice</label>
                             </div>
                         </div>
@@ -155,7 +212,8 @@
             {/if}
         </div>
         <div class="lower-buttons">
-            <button type="button" class="btn btn-lg btn-success" on:click={goToNextShot}>Next shot</button>
+            <button type="button" class="btn btn-lg btn-primary" on:click={saveShot}>Save shot</button>
+            <button type="button" class="btn btn-lg btn-success" on:click={saveAndGoToNextShot}>Save and next shot</button>
         </div>
     </div>
 </div>

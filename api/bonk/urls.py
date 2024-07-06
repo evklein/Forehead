@@ -21,5 +21,6 @@ urlpatterns = [
     path('schema-viewer/', include('schema_viewer.urls')),
     path("round/", include("round.urls")),
     path("course/", include("course.urls")),
+    path("practice/", include("practice.urls")),
     path('admin/', admin.site.urls),
 ]
