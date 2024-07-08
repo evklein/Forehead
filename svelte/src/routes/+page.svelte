@@ -6,16 +6,47 @@
 	<meta name="description" content="Bonk" />
 </svelte:head>
 
-<section>
-	<h3>
-		<span class="welcome">
-			<p>Welcome to <b class="bonk">Bonk</b>, an open Golf analytics solution.</p>
-		</span>
-	</h3>
-    <div class="links">
-        <a href="/courses">View Courses</a>
+<div>
+    <div class="row align-items-start">
+        <h3>
+            <span class="welcome">
+                <p>Welcome to <b class="bonk">Bonk</b>, an open Golf analytics solution.</p>
+            </span>
+        </h3>
     </div>
-</section>
+    <div class="row align-items-start">
+        <div class="col-4">
+            <a href="/rounds">
+                <div class="card">
+                    <img class="card-img-top" src="https://www.thebreakfastball.com/wp-content/uploads/2017/09/2017-93-Crooked-Stick-GC-hole-6.jpg" alt="Course">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Play
+                        </h5>
+                        <p class="card-text">
+                            Play a round of golf. Record the data for analytics.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-4">
+            <a href="/practice">
+                <div class="card">
+                    <img class="card-img-top" src="https://media.istockphoto.com/id/489515598/photo/female-golfer-practicing-on-a-driving-range.jpg?s=612x612&w=0&k=20&c=uAtg7QQhw_DfNvrO9updTuJcVsmy0c6sfRpKRWKKX80=" alt="Course">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            Practice
+                        </h5>
+                        <p class="card-text">
+                            Practice different parts of the game.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 
 <style>
 	section {
@@ -26,20 +57,11 @@
 		flex: 0.6;
 	}
 
-	.welcome {
-		display: block;
-		width: 100%;
-		height: 0;
-		padding: 0;
-        text-align: center;
-	}
-
     .bonk {
         color: green;
     }
 
-    .links {
-        position: relative;
-        top: 50px;
+    a {
+        text-decoration: none;
     }
 </style>

@@ -15,6 +15,7 @@
     export let handleGoToNextHole: Function;
     export let handleGoToPreviousHole: Function;
     export let handleAdvance: Function;
+    export let handleSelectCurrentPosition: Function;
     export let selectedPoints: [number, number][];
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
@@ -39,14 +40,28 @@
         }
     }
 
+    function removeStroke(strokeNumber: number) {
+        console.log("Removing stroke " + strokeNumber);
+        console.log(holeScore.strokes);
+        let strokeIndex = strokeNumber - 1;
+        holeScore.strokes.splice(strokeIndex, 1);
+        for (let i = strokeIndex; i < holeScore.strokes.length; i++) { // Reduce stroke number for subsequent strokes
+            holeScore.strokes[i].strokeNumber--;
+        }
+        holeScore.strokes = holeScore.strokes; // Trigger re-render
+        console.log(holeScore.strokes);
+    }
+
+    function addStroke(strokeNumber: number, coordinates?: [number, number]) {
+        holeScore.strokes = [...holeScore.strokes, {
+            strokeNumber,
+            penalty: false,
+            startCoordinate: coordinates
+        }];
+    }
+
     async function saveAll() {
-        console.log(holeScore);
-        console.log(round);
-        console.log(hole);
-        // Save Hole Stats
         if (round.id && hole.id) {
-            console.log('Saving stats');
-            console.log(holeScore.stats);
             await api.saveHoleStats(round.id, hole.id, holeScore.stats);
         }
 
@@ -86,9 +101,15 @@
         handleAdvance();
     }
 
-    function clicker() {
-        console.log("click");
-        console.log(holeScore.stats);
+    function placePoint() {
+        navigator.geolocation.getCurrentPosition((position) => {
+            let lat = position.coords.latitude + Math.random() * 0.001;
+            let long = position.coords.longitude + Math.random() * 0.001;
+            handleSelectCurrentPosition([lat, long]);
+            if (selectedPoints.length >= 1) {
+                addStroke(holeScore.strokes.length + 1, [lat, long]);
+            }
+        })
     }
 </script>
 {#if holeScore}
@@ -135,7 +156,6 @@
                         <td class="td-20">
                             <input class="score-checkbox form-check-input"
                                 type="checkbox"
-                                on:click={clicker}
                                 bind:checked={holeScore.stats.greenInRegulation}>
                         </td>
                         <td class="td-20">
@@ -155,6 +175,9 @@
                     </tr>
                 </tbody>
             </table>
+            <button class="btn btn-success place-shot-btn" on:click={placePoint}>
+                <i class="fa-solid fa-location-dot"></i> Place
+            </button>
         </div>
         <div class="shot-entry">
             <table class="table table-bordered">
@@ -164,7 +187,9 @@
                         <th scope="col">Club</th>
                         <th scope="col">Distance (Yards)</th>
                         <th scope="col">To Center</th>
+                        <th scope="col">Coord.</th>
                         <th scope="col">Penalty</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -207,10 +232,18 @@
                                         ).toFixed(1)}
                                     {/if}
                                 </td>
+                                <td class="shot-coords">
+                                    {`[${holeScore.strokes[strokeNumber]?.startCoordinate?.[0].toFixed(3)}, ${holeScore.strokes[strokeNumber]?.startCoordinate?.[1].toFixed(3)}]`}
+                                </td>
                                 <td>
                                     <input class="penalty-checkbox form-check-input"
                                             type="checkbox" value="" id="flexCheckDefault">
-                                    </td>
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger" on:click={() => removeStroke(strokeNumber + 1)}>
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
                         {/each}
                     {/if}
@@ -230,7 +263,7 @@
                     {#if holeScore?.strokes && holeScore?.putts}
                         {#each {length: holeScore.putts.length ?? 0} as _, i}
                         <tr>
-                            <td>{holeScore.strokes.length - holeScore.putts.length + i + 1}</td>
+                            <td>{holeScore.putts.length + i}</td>
                             <td>{i + 1}</td>
                             <td>
                                 <input class="form-control" type="text" placeholder="" />
@@ -281,6 +314,13 @@
         margin: auto;
         margin-top: 5px;
     }
+    .score-entry {
+        display: flex;
+        flex-direction: row;
+    }
+    .place-shot-btn {
+        margin: auto 10px;
+    }
     .penalty-checkbox {
         width: 1.75em;
         height: 1.75em;
@@ -309,11 +349,11 @@
     .stats-control {
         border: 0;
     }
-    .score-entry {
-        width: 300px;
-    }
     .shot-entry {
         width: 400px;
+    }
+    .shot-coords {
+        font-size: 9pt;
     }
     .putting-entry {
         width: 250px;

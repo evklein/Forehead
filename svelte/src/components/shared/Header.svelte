@@ -6,8 +6,8 @@
                 </h1>
             </a>
         <div class="header-links">
-            <a href="/rounds">Rounds</a>
             <a href="/practice">Practice</a>
+            <a href="/rounds">Play</a>
         </div>
     </div>
 </header>

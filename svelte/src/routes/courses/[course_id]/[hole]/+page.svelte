@@ -44,14 +44,24 @@
 
         mapCanBeLoaded = true;
     });
+
+    function selectPoints(coordinates: [number, number]) {
+        hole.boundPoints = [...hole.boundPoints, coordinates];
+    }
 </script>
 <div class="row align-items-start">
     <div class="col-7">
     {#if mapCanBeLoaded}
         {#if initialBoundPointCount === 0}
-            <Map bind:focusBounds={course.boundPoints} bind:selectedBounds={hole.boundPoints} highlightSelectedbounds={false} />
+            <Map bind:focusBounds={course.boundPoints}
+                bind:selectedBounds={hole.boundPoints}
+                handleSelectPointOnMap={selectPoints}
+                highlightSelectedbounds={false} />
         {:else}
-            <Map bind:focusBounds={hole.boundPoints} bind:selectedBounds={hole.boundPoints} highlightSelectedbounds={true} specialPoints={hole.centerGreenPoint ? [hole.centerGreenPoint] : []} />
+            <Map bind:focusBounds={hole.boundPoints}
+                bind:selectedBounds={hole.boundPoints}
+                highlightSelectedbounds={true}
+                specialPoints={hole.centerGreenPoint ? [hole.centerGreenPoint] : []} />
         {/if}
     {/if}
     </div>

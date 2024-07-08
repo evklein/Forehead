@@ -1,18 +1,25 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { afterUpdate, onMount } from 'svelte';
     import { MapMarkerChoice } from './MapMarkerChoice';
+    import { layerGroup } from 'leaflet';
 
     export let focusBounds: [number, number][];
     export let selectedBounds: [number, number][];
     export let highlightSelectedbounds: boolean;
     export let specialPoints: [number, number][] = [];
-    export let handleSelectPointOnMap: Function;
+    export let handleSelectPointOnMap: Function | undefined = undefined;
     export let markerChoice: MapMarkerChoice = MapMarkerChoice.Default;
 
     let map: L.Map;
+    let markerLayerGroup: L.LayerGroup;
 
     onMount(async () => {
         await buildMap();
+        await placeMarkers(specialPoints);
+    });
+
+    afterUpdate(async () => {
+        await placeMarkers(specialPoints);
     });
 
     async function buildMap() {
@@ -35,30 +42,9 @@
 
             map.on('click', (e) => {
                 let wrappedCoordinates = e.latlng.wrap();
-                let marker: any;
-                switch (markerChoice) {
-                    case MapMarkerChoice.Default:
-                        marker = L.marker(wrappedCoordinates).addTo(map);
-                        marker.bindPopup(`[${wrappedCoordinates.lat}, ${wrappedCoordinates.lng}]`);
-                        break;
-                    case MapMarkerChoice.ShotTracer:
-                        marker = L.circleMarker(wrappedCoordinates, {
-                            fillColor: selectedBounds.length > 0 ? 'white' : 'yellow',
-                            color: selectedBounds.length > 0 ? 'white' : 'yellow',
-                            radius: 8,
-                        }).addTo(map);
-                        if (selectedBounds.length >= 1) {
-                            let lastSelectedBounds = selectedBounds[selectedBounds.length - 1];
-                            let line = L.polyline([wrappedCoordinates, lastSelectedBounds], { color: 'white' }).addTo(map);
-
-                        }
-                        break;
+                if (handleSelectPointOnMap) {
+                    handleSelectPointOnMap([wrappedCoordinates.lat, wrappedCoordinates.lng]);
                 }
-                // selectedBounds.push([wrappedCoordinates.lat, wrappedCoordinates.lng]);
-                // selectedBounds = selectedBounds;
-
-                console.log(selectedBounds.length);
-                handleSelectPointOnMap(wrappedCoordinates);
             });
 
             if (specialPoints && Array.isArray(specialPoints)) {
@@ -70,6 +56,41 @@
                         console.warn('Invalid point format', point);
                     }
                 });
+            }
+        }
+        
+        return L;
+    }
+
+    async function placeMarkers(markerCoordinates: [number, number][]) {
+        const L = await import('leaflet');
+        await import('leaflet/dist/leaflet.css');
+
+        if (markerLayerGroup == null) {
+            markerLayerGroup = L.layerGroup().addTo(map);
+        } else {
+            markerLayerGroup.clearLayers();
+        }
+
+        for (let i = 0; i < markerCoordinates.length; i++) {
+            let marker;
+            switch (markerChoice) {
+                case MapMarkerChoice.Default:
+                    marker = L.marker(markerCoordinates[i] as [number, number]).addTo(markerLayerGroup);
+                    marker.bindPopup(`[${markerCoordinates[0]}, ${markerCoordinates[1]}]`);
+                    break;
+                case MapMarkerChoice.ShotTracer:
+                    marker = L.circleMarker(markerCoordinates[i] as [number, number], {
+                        fillColor: i > 0 ? 'white' : 'yellow',
+                        color: i > 0 ? 'white' : 'yellow',
+                        radius: 8,
+                    }).addTo(map);
+
+                    if (selectedBounds.length > 1 && i >= 1) {
+                        let lastSelectedBounds = selectedBounds[i - 1];
+                        L.polyline([markerCoordinates[i] as [number, number], lastSelectedBounds], { color: 'white' }).addTo(markerLayerGroup);
+                    }
+                    break;
             }
         }
     }

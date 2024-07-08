@@ -40,9 +40,8 @@
         selectedPoints = [];
     }
 
-    function selectPointOnMap(position: any) {
-        selectedPoints.push([position.lat, position.lng]);
-        selectedPoints = selectedPoints;
+    function selectPointOnMap(coordinates: [number, number]) {
+        selectedPoints = [...selectedPoints, coordinates];
     }
 
     function getCurrentInstructions(): string {
@@ -60,7 +59,6 @@
             }
         }
 
-
         return "Fill out scorecard";
     }
 </script>
@@ -70,6 +68,7 @@
             {#key currentHoleIndex}
                 <Map focusBounds={currentHole.boundPoints}
                     bind:selectedBounds={selectedPoints}
+                    specialPoints={selectedPoints}
                     highlightSelectedbounds={true}
                     handleSelectPointOnMap={selectPointOnMap}
                     markerChoice={MapMarkerChoice.ShotTracer}
@@ -90,6 +89,7 @@
             handleGoToPreviousHole={decrementCurrentHoleNumber}
             {handleAdvance}
             {selectedPoints}
+            handleSelectCurrentPosition={selectPointOnMap}
         />
     </div>
 </div>
