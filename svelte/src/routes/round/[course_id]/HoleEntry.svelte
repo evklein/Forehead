@@ -16,6 +16,7 @@
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
     
+    let selectedStrokeIndex: number | undefined = undefined;
     let currentHoleIndex: number = 0;
     let currentHole: HoleData;
     let currentHoleScore: HoleScore;
@@ -41,7 +42,13 @@
     }
 
     function selectPointOnMap(coordinates: [number, number]) {
-        selectedPoints = [...selectedPoints, coordinates];
+        if (selectedStrokeIndex == undefined) {
+            selectedPoints = [...selectedPoints, coordinates];
+        } else {
+            selectedPoints[selectedStrokeIndex] = coordinates;
+        }
+
+        selectedStrokeIndex = undefined;
     }
 
     function getCurrentInstructions(): string {
@@ -60,6 +67,10 @@
         }
 
         return "Fill out scorecard";
+    }
+
+    function setTargetCoordinate(strokeNumber: number) {
+        selectedStrokeIndex = strokeNumber;
     }
 </script>
 <div class="row align-items-start">
@@ -90,6 +101,7 @@
             {handleAdvance}
             {selectedPoints}
             handleSelectCurrentPosition={selectPointOnMap}
+            handleSetTargetCoordinate={setTargetCoordinate}
         />
     </div>
 </div>

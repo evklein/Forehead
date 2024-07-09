@@ -1,7 +1,6 @@
 <script lang="ts">
     import { afterUpdate, onMount } from 'svelte';
     import { MapMarkerChoice } from './MapMarkerChoice';
-    import { layerGroup } from 'leaflet';
 
     export let focusBounds: [number, number][];
     export let selectedBounds: [number, number][];

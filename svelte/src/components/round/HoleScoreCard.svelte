@@ -16,6 +16,7 @@
     export let handleGoToPreviousHole: Function;
     export let handleAdvance: Function;
     export let handleSelectCurrentPosition: Function;
+    export let handleSetTargetCoordinate: Function;
     export let selectedPoints: [number, number][];
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
@@ -56,8 +57,12 @@
         holeScore.strokes = [...holeScore.strokes, {
             strokeNumber,
             penalty: false,
-            startCoordinate: coordinates
+            startCoordinate: coordinates,
         }];
+
+        if (strokeNumber > 1) {
+            holeScore.strokes[strokeNumber - 2].endCoordinate = coordinates;
+        }
     }
 
     async function saveAll() {
@@ -103,10 +108,10 @@
 
     function placePoint() {
         navigator.geolocation.getCurrentPosition((position) => {
-            let lat = position.coords.latitude + Math.random() * 0.001;
-            let long = position.coords.longitude + Math.random() * 0.001;
+            let lat = position.coords.latitude; // + Math.random() * 0.001;
+            let long = position.coords.longitude; //  + Math.random() * 0.001;
             handleSelectCurrentPosition([lat, long]);
-            if (selectedPoints.length >= 1) {
+            if (selectedPoints.length >= 0) {
                 addStroke(holeScore.strokes.length + 1, [lat, long]);
             }
         })
@@ -187,7 +192,8 @@
                         <th scope="col">Club</th>
                         <th scope="col">Distance (Yards)</th>
                         <th scope="col">To Center</th>
-                        <th scope="col">Coord.</th>
+                        <th scope="col">Start</th>
+                        <th scope="col">End</th>
                         <th scope="col">Penalty</th>
                         <th scope="col"></th>
                     </tr>
@@ -233,7 +239,14 @@
                                     {/if}
                                 </td>
                                 <td class="shot-coords">
-                                    {`[${holeScore.strokes[strokeNumber]?.startCoordinate?.[0].toFixed(3)}, ${holeScore.strokes[strokeNumber]?.startCoordinate?.[1].toFixed(3)}]`}
+                                    <button class="btn btn-link coordinate" on:click={() => handleSetTargetCoordinate(strokeNumber)}>
+                                        {`[${holeScore.strokes[strokeNumber]?.startCoordinate?.[0].toFixed(5)}, ${holeScore.strokes[strokeNumber]?.startCoordinate?.[1].toFixed(5)}]`}
+                                    </button>
+                                </td>
+                                <td class="shot-coords">
+                                    <button class="btn btn-link coordinate" on:click={() => handleSetTargetCoordinate(strokeNumber)}>
+                                        {`[${holeScore.strokes[strokeNumber]?.endCoordinate?.[0].toFixed(5)}, ${holeScore.strokes[strokeNumber]?.endCoordinate?.[1].toFixed(5)}]`}
+                                    </button>
                                 </td>
                                 <td>
                                     <input class="penalty-checkbox form-check-input"

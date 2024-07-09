@@ -16,6 +16,11 @@ def fetchRound(request, round_id):
     trimmed_data = raw_data[1:-1]
     return HttpResponse(trimmed_data, content_type='application/json')
 
+def fetchRoundsInProgress(request):
+    rounds = Round.objects.filter(in_progress=True)
+    raw_data = serializers.serialize('json', rounds)
+    return HttpResponse(raw_data, content_type='application/json')
+
 def fetchAllHoleStatsForRound(request, round_id):
     hole_scores = HoleStats.objects.filter(rnd=round_id)
     raw_data = serializers.serialize('json', hole_scores)

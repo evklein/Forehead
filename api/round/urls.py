@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("new/", views.saveNewRound, name="saveNewRound"),
+    path("in-progress/", views.fetchRoundsInProgress, name="fetchRoundsInProgress"),
     path("<int:round_id>/", views.fetchRound, name="fetchRound"),
     path("<int:round_id>/stats/", views.fetchRoundHoleStats, name="fetchRoundHoleStats"),
     path("<int:round_id>/strokes/", views.fetchRoundStrokes, name="fetchRoundStrokes"),

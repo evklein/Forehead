@@ -172,6 +172,26 @@ export async function fetchTees(courseId: number) {
     }
 }
 
+export async function fetchInProgressRounds() {
+    const endpoint = `/round/in-progress/`;
+    let rounds: RoundData[] = [];
+    try {
+        const rawData: any = await apiHelpers.get(BONK_API_URL, endpoint);
+        for (let i = 0; i < rawData.length; i++) {
+            let nextObject = rawData[i];
+            rounds.push({
+                datePlayed: nextObject['fields']['date_played'],
+                holesCompleted: nextObject['fields']['holes_completed'],
+                courseId: nextObject['fields']['course']
+            });
+        }
+        return rounds;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
 export async function saveRound(roundData: RoundData, courseId: number, teeId: number): Promise<number> {
     const endpoint = `/round/new/?course_id=${courseId}&tee_id=${teeId}`;
     let requestBody: string = JSON.stringify({
@@ -197,7 +217,6 @@ export async function saveRound(roundData: RoundData, courseId: number, teeId: n
 
 export async function saveHoleStats(roundId: number, holeId: number, stats: HoleStatsData) {
     const endpoint = `/round/${roundId}/hole/${holeId}/new/`;
-    console.log("saving");
     let requestBody: string = JSON.stringify({
         gir: stats.greenInRegulation,
         gld: stats.greenLightDrive,
