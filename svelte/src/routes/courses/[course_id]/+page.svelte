@@ -1,25 +1,25 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import Map from "../../../components/shared/Map.svelte";
-    import { page } from "$app/stores";
-    import type { CourseData } from "../../../models/CourseData";
-    import CourseFormCard from "./CourseFormCard.svelte";
-    import * as api from "../../../services/api";
-    import type { HoleData } from "../../../models/HoleData";
-    import type { TeeData } from "../../../models/TeeData";
+    import { onMount } from 'svelte';
+    import Map from '../../../components/shared/Map.svelte';
+    import { page } from '$app/stores';
+    import type { CourseData } from '../../../models/CourseData';
+    import CourseFormCard from './CourseFormCard.svelte';
+    import * as api from '../../../services/api';
+    import type { HoleData } from '../../../models/HoleData';
+    import type { TeeData } from '../../../models/TeeData';
 
     $: params = $page.params;
     $: id = Number(params.course_id);
 
     let course: CourseData = {
         courseId: -1,
-        name: "",
+        name: '',
         numberOfHoles: 0,
         par: 0,
         public: false,
-        designer: "",
-        address: "",
-        imageUrl: "",
+        designer: '',
+        address: '',
+        imageUrl: '',
         boundPoints: [],
     };
     let currentlySelectedHoleNumber: number = 1;

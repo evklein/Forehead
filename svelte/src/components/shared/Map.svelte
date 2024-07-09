@@ -28,26 +28,33 @@
         if (!map) {
             map = L.map('map').setView([0, 0], 0);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                attribution:
+                    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 maxZoom: 20,
             }).addTo(map);
 
             if (focusBounds.length > 0) {
                 map.fitBounds(focusBounds);
                 if (highlightSelectedbounds) {
-                    L.polygon(focusBounds, { fillColor: 'green', color: 'green' }).addTo(map);
+                    L.polygon(focusBounds, {
+                        fillColor: 'green',
+                        color: 'green',
+                    }).addTo(map);
                 }
             }
 
             map.on('click', (e) => {
                 let wrappedCoordinates = e.latlng.wrap();
                 if (handleSelectPointOnMap) {
-                    handleSelectPointOnMap([wrappedCoordinates.lat, wrappedCoordinates.lng]);
+                    handleSelectPointOnMap([
+                        wrappedCoordinates.lat,
+                        wrappedCoordinates.lng,
+                    ]);
                 }
             });
 
             if (specialPoints && Array.isArray(specialPoints)) {
-                specialPoints.forEach(point => {
+                specialPoints.forEach((point) => {
                     if (Array.isArray(point) && point.length === 2) {
                         let [latitude, longitude] = point;
                         L.marker([latitude, longitude]).addTo(map);
@@ -57,7 +64,7 @@
                 });
             }
         }
-        
+
         return L;
     }
 
@@ -75,28 +82,43 @@
             let marker;
             switch (markerChoice) {
                 case MapMarkerChoice.Default:
-                    marker = L.marker(markerCoordinates[i] as [number, number]).addTo(markerLayerGroup);
-                    marker.bindPopup(`[${markerCoordinates[0]}, ${markerCoordinates[1]}]`);
+                    marker = L.marker(
+                        markerCoordinates[i] as [number, number],
+                    ).addTo(markerLayerGroup);
+                    marker.bindPopup(
+                        `[${markerCoordinates[0]}, ${markerCoordinates[1]}]`,
+                    );
                     break;
                 case MapMarkerChoice.ShotTracer:
-                    marker = L.circleMarker(markerCoordinates[i] as [number, number], {
-                        fillColor: i > 0 ? 'white' : 'yellow',
-                        color: i > 0 ? 'white' : 'yellow',
-                        radius: 8,
-                    }).addTo(map);
+                    marker = L.circleMarker(
+                        markerCoordinates[i] as [number, number],
+                        {
+                            fillColor: i > 0 ? 'white' : 'yellow',
+                            color: i > 0 ? 'white' : 'yellow',
+                            radius: 8,
+                        },
+                    ).addTo(map);
 
                     if (selectedBounds.length > 1 && i >= 1) {
                         let lastSelectedBounds = selectedBounds[i - 1];
-                        L.polyline([markerCoordinates[i] as [number, number], lastSelectedBounds], { color: 'white' }).addTo(markerLayerGroup);
+                        L.polyline(
+                            [
+                                markerCoordinates[i] as [number, number],
+                                lastSelectedBounds,
+                            ],
+                            { color: 'white' },
+                        ).addTo(markerLayerGroup);
                     }
                     break;
             }
         }
     }
 </script>
+
 <div id="map-wrapper">
     <div id="map"></div>
 </div>
+
 <style>
     #map-wrapper {
         height: 100%;
@@ -106,6 +128,6 @@
         height: 600px; /* Adjust height as needed */
         width: 100%;
         border: 4px solid darkgreen;
-        border-radius:5px;
+        border-radius: 5px;
     }
 </style>

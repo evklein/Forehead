@@ -1,21 +1,21 @@
 <script lang="ts">
-    import type { EventHandler } from "svelte/elements";
-    import HoleScoreCard from "../../../components/round/HoleScoreCard.svelte";
-    import type { HoleData } from "../../../models/HoleData";
-    import { onMount } from "svelte";
-    import type { HoleScore } from "../../../models/HoleScore";
-    import Map from "../../../components/shared/Map.svelte";
-    import InputDirector from "../../../components/round/InputDirector.svelte";
-    import { MapMarkerChoice } from "../../../components/shared/MapMarkerChoice";
-    import type { CourseData } from "../../../models/CourseData";
-    import type { RoundData } from "../../../models/RoundData";
+    import type { EventHandler } from 'svelte/elements';
+    import HoleScoreCard from '../../../components/round/HoleScoreCard.svelte';
+    import type { HoleData } from '../../../models/HoleData';
+    import { onMount } from 'svelte';
+    import type { HoleScore } from '../../../models/HoleScore';
+    import Map from '../../../components/shared/Map.svelte';
+    import InputDirector from '../../../components/round/InputDirector.svelte';
+    import { MapMarkerChoice } from '../../../components/shared/MapMarkerChoice';
+    import type { CourseData } from '../../../models/CourseData';
+    import type { RoundData } from '../../../models/RoundData';
 
     export let round: RoundData;
     export let course: CourseData;
     export let holes: HoleData[];
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
-    
+
     let selectedStrokeIndex: number | undefined = undefined;
     let currentHoleIndex: number = 0;
     let currentHole: HoleData;
@@ -52,8 +52,13 @@
     }
 
     function getCurrentInstructions(): string {
-        if (currentHoleScore.numberOfStrokes && currentHoleScore.numberOfPutts) {
-            let numberOfPointToBeMarked = currentHoleScore.numberOfStrokes - currentHoleScore.numberOfPutts;
+        if (
+            currentHoleScore.numberOfStrokes &&
+            currentHoleScore.numberOfPutts
+        ) {
+            let numberOfPointToBeMarked =
+                currentHoleScore.numberOfStrokes -
+                currentHoleScore.numberOfPutts;
             if (selectedPoints.length === 0) {
                 return `
                     Mark any <span style="color: darkred; font-weight: bold;"">penalty shots</span> first on score card<br />
@@ -66,16 +71,19 @@
             }
         }
 
-        return "Fill out scorecard";
+        return 'Fill out scorecard';
     }
 
     function setTargetCoordinate(strokeNumber: number) {
         selectedStrokeIndex = strokeNumber;
     }
 </script>
+
 <div class="row align-items-start">
     <div class="col-12">
-        <HoleScoreCard {round} {course}
+        <HoleScoreCard
+            {round}
+            {course}
             bind:hole={currentHole}
             bind:holeScore={currentHoleScore}
             handleGoToNextHole={incrementCurrentHoleNumber}
@@ -87,7 +95,7 @@
         />
         {#if currentHole}
             <InputDirector>
-                {#key currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints}
+                {#key (currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints)}
                     {@html getCurrentInstructions()}
                 {/key}
             </InputDirector>
@@ -96,7 +104,8 @@
     <div class="col-10">
         {#if currentHole}
             {#key currentHoleIndex}
-                <Map focusBounds={currentHole.boundPoints}
+                <Map
+                    focusBounds={currentHole.boundPoints}
                     bind:selectedBounds={selectedPoints}
                     specialPoints={selectedPoints}
                     highlightSelectedbounds={true}

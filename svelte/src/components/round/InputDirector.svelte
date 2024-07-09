@@ -1,8 +1,10 @@
 <script lang="ts">
 </script>
+
 <div class="input-director">
     <slot />
 </div>
+
 <style>
     .input-director {
         border: 1px solid #ccc;

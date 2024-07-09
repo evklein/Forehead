@@ -1,10 +1,10 @@
 <header>
     <div id="header">
-            <a class="brand-link" href="/">
-                <h1 id="brand">
-                    <i class="brand-icon fa-solid fa-golf-ball-tee"></i> Bonk
-                </h1>
-            </a>
+        <a class="brand-link" href="/">
+            <h1 id="brand">
+                <i class="brand-icon fa-solid fa-golf-ball-tee"></i> Bonk
+            </h1>
+        </a>
         <div class="header-links">
             <a href="/practice">Practice</a>
             <a href="/rounds">Play</a>
@@ -55,7 +55,7 @@
         font-size: 12pt;
         transition: 0.3s;
     }
-    .header-links> a:hover {
+    .header-links > a:hover {
         font-weight: bold;
         color: darkgreen;
     }

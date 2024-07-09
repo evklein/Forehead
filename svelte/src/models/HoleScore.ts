@@ -1,6 +1,6 @@
-import type { HoleStatsData } from "./HoleStatsData";
-import type { PuttData } from "./PuttData";
-import type { StrokeData } from "./StrokeData";
+import type { HoleStatsData } from './HoleStatsData';
+import type { PuttData } from './PuttData';
+import type { StrokeData } from './StrokeData';
 
 export interface HoleScore {
     numberOfStrokes?: number;

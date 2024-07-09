@@ -7,12 +7,14 @@
     let courses: CourseData[] = [];
 
     onMount(async () => {
-        courses = await api.fetchAllCourses() ?? [];
+        courses = (await api.fetchAllCourses()) ?? [];
     });
 </script>
+
 <div class="row align-items-start">
     {#each courses as course}
         <CourseCard {course} />
     {/each}
 </div>
+
 <style></style>

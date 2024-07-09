@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { EventHandler } from "svelte/elements";
-    import type { CourseData } from "../../../models/CourseData";
-    import type { TeeData } from "../../../models/TeeData";
+    import type { EventHandler } from 'svelte/elements';
+    import type { CourseData } from '../../../models/CourseData';
+    import type { TeeData } from '../../../models/TeeData';
 
     export let course: CourseData;
     export let saveCourse: EventHandler;

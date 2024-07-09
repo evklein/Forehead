@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { RoundData } from "../../../models/RoundData";
-    import type { TeeData } from "../../../models/TeeData";
-    import * as api from "../../../services/api";
-    import type { CourseData } from "../../../models/CourseData";
+    import type { RoundData } from '../../../models/RoundData';
+    import type { TeeData } from '../../../models/TeeData';
+    import * as api from '../../../services/api';
+    import type { CourseData } from '../../../models/CourseData';
 
     export let course: CourseData;
     export let round: RoundData;
@@ -12,12 +12,13 @@
     let selectedTee: TeeData;
 
     async function advance() {
-        console.log("SAVING: " + course.name + " " + selectedTee.name);
+        console.log('SAVING: ' + course.name + ' ' + selectedTee.name);
         console.log(round);
         round.id = await api.saveRound(round, course.courseId, selectedTee.id);
         handleAdvance();
     }
 </script>
+
 <div class="row align-items-start">
     <div class="card">
         <div class="card-body">
@@ -174,6 +175,7 @@
         </div>
     </div>
 </div>
+
 <style>
     .course-detail {
         font-size: 14pt;

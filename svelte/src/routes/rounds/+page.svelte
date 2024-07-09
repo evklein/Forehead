@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import type { CourseData } from "../../models/CourseData";
-    import type { RoundData } from "../../models/RoundData";
-    import InProgressRoundCard from "./InProgressRoundCard.svelte";
-    import * as api from "../../services/api";
+    import { onMount } from 'svelte';
+    import type { CourseData } from '../../models/CourseData';
+    import type { RoundData } from '../../models/RoundData';
+    import InProgressRoundCard from './InProgressRoundCard.svelte';
+    import * as api from '../../services/api';
 
     export let rounds: RoundData[] = [];
     export let courses: CourseData[] = [];
@@ -13,25 +13,29 @@
 
     onMount(async () => {
         try {
-            rounds = await api.fetchInProgressRounds() ?? [];
-            console.log("Rounds fetched:", rounds);
+            rounds = (await api.fetchInProgressRounds()) ?? [];
+            console.log('Rounds fetched:', rounds);
 
-            let uniqueCourseIds = [...new Set(rounds.map(r => r.courseId))];
-            let courseDataPromises = uniqueCourseIds.map(courseId => api.fetchCourseDetails(courseId ?? -1));
+            let uniqueCourseIds = [...new Set(rounds.map((r) => r.courseId))];
+            let courseDataPromises = uniqueCourseIds.map((courseId) =>
+                api.fetchCourseDetails(courseId ?? -1),
+            );
 
             const fetchedCourses = await Promise.all(courseDataPromises);
-            courses = fetchedCourses.filter(course => course !== undefined) as CourseData[];
-            console.log("Courses fetched:", courses);
+            courses = fetchedCourses.filter(
+                (course) => course !== undefined,
+            ) as CourseData[];
+            console.log('Courses fetched:', courses);
         } catch (error) {
-            console.error("Error fetching data:", error);
+            console.error('Error fetching data:', error);
         } finally {
             loading = false;
         }
     });
 
     function getCourseForRound(round: RoundData): CourseData | undefined {
-        let selectedCourse = courses.find(c => c.courseId === round.courseId);
-        console.log("Selected course for round:", round, selectedCourse);
+        let selectedCourse = courses.find((c) => c.courseId === round.courseId);
+        console.log('Selected course for round:', round, selectedCourse);
         return selectedCourse;
     }
 </script>

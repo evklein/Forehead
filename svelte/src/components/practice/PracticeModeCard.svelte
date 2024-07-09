@@ -5,9 +5,10 @@
     export let link: string;
     export let badgeText: string | undefined = undefined;
 </script>
+
 <div class="col-4">
     <div class="card">
-        <img class="card-img-top" src={imagePath} alt="Course">
+        <img class="card-img-top" src={imagePath} alt="Course" />
         {#if badgeText}
             <span class="badge text-bg-success">{badgeText}</span>
         {/if}
@@ -16,10 +17,13 @@
                 <span class="card-title-emphasize">{mode}</span>
             </h5>
             <p class="card-text">{description}</p>
-            <a href={link} class="btn btn-success">Play <i class="fa-solid fa-play"></i></a>
+            <a href={link} class="btn btn-success"
+                >Play <i class="fa-solid fa-play"></i></a
+            >
         </div>
     </div>
 </div>
+
 <style>
     .badge {
         position: absolute;
