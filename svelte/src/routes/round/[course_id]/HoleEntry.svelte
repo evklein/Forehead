@@ -74,25 +74,7 @@
     }
 </script>
 <div class="row align-items-start">
-    <div class="col-6">
-        {#if currentHole}
-            {#key currentHoleIndex}
-                <Map focusBounds={currentHole.boundPoints}
-                    bind:selectedBounds={selectedPoints}
-                    specialPoints={selectedPoints}
-                    highlightSelectedbounds={true}
-                    handleSelectPointOnMap={selectPointOnMap}
-                    markerChoice={MapMarkerChoice.ShotTracer}
-                />
-                <InputDirector>
-                    {#key currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints}
-                        {@html getCurrentInstructions()}
-                    {/key}
-                </InputDirector>
-            {/key}
-        {/if}
-    </div>
-    <div class="col-6">
+    <div class="col-12">
         <HoleScoreCard {round} {course}
             bind:hole={currentHole}
             bind:holeScore={currentHoleScore}
@@ -103,5 +85,25 @@
             handleSelectCurrentPosition={selectPointOnMap}
             handleSetTargetCoordinate={setTargetCoordinate}
         />
+        {#if currentHole}
+            <InputDirector>
+                {#key currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints}
+                    {@html getCurrentInstructions()}
+                {/key}
+            </InputDirector>
+        {/if}
+    </div>
+    <div class="col-10">
+        {#if currentHole}
+            {#key currentHoleIndex}
+                <Map focusBounds={currentHole.boundPoints}
+                    bind:selectedBounds={selectedPoints}
+                    specialPoints={selectedPoints}
+                    highlightSelectedbounds={true}
+                    handleSelectPointOnMap={selectPointOnMap}
+                    markerChoice={MapMarkerChoice.ShotTracer}
+                />
+            {/key}
+        {/if}
     </div>
 </div>

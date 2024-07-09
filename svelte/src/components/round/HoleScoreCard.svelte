@@ -6,6 +6,7 @@
     import * as api from "../../services/api";
     import type { CourseData } from "../../models/CourseData";
     import type { RoundData } from "../../models/RoundData";
+    import { onMount } from "svelte";
 
     // Props
     export let course: CourseData;
@@ -21,18 +22,10 @@
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
 
-    function createStrokesAndPutts(event: any) {
-        holeScore.strokes = [];
+    function createPutts(event: any) {
         holeScore.putts = [];
 
-        if (holeScore.numberOfStrokes && holeScore.numberOfPutts) {
-            for (let i = 0; i < holeScore.numberOfStrokes - holeScore.numberOfPutts; i++) {
-                holeScore.strokes.push({
-                    strokeNumber: i + 1,
-                    penalty: false,
-                });
-            }
-    
+        if (holeScore.numberOfStrokes && holeScore.numberOfPutts) {    
             for (let i = 0; i < holeScore.numberOfPutts; i++) {
                 holeScore.putts.push({
                     strokeNumber: i + holeScore.numberOfStrokes + 1,
@@ -51,6 +44,7 @@
         }
         holeScore.strokes = holeScore.strokes; // Trigger re-render
         console.log(holeScore.strokes);
+        holeScore.numberOfStrokes = holeScore.numberOfStrokes != undefined ? holeScore.numberOfStrokes - 1 : 0;
     }
 
     function addStroke(strokeNumber: number, coordinates?: [number, number]) {
@@ -63,6 +57,8 @@
         if (strokeNumber > 1) {
             holeScore.strokes[strokeNumber - 2].endCoordinate = coordinates;
         }
+
+        holeScore.numberOfStrokes = holeScore.numberOfStrokes != undefined ? holeScore.numberOfStrokes + 1 : 0;
     }
 
     async function saveAll() {
@@ -136,39 +132,47 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col">S</th>
-                        <th scope="col">P</th>
-                        <th scope="col">GIR</th>
+                        <th scope="col">Full Shots</th>
+                        <th scope="col">Putts</th>
+                        <th scope="col">Strokes</th>
+                        <th scope="col" style="width: 20px;">GIR</th>
                         <th scope="col">GLD</th>
                         <th scope="col">SCR</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="td-20">
+                        <td>
                             <input type="text"
                                 class="stats-control form-control"
                                 bind:value={holeScore.numberOfStrokes}
                                 aria-label="strokes">
                         </td>
-                        <td class="td-20">
+                        <td>
                             <input type="text"
                                 class="stats-control form-control"
                                 bind:value={holeScore.numberOfPutts}
-                                on:change|preventDefault={createStrokesAndPutts}
+                                on:change|preventDefault={createPutts}
                                 aria-label="putts">
                         </td>
-                        <td class="td-20">
+                        <td>
+                            <input type="text"
+                                class="stats-control form-control"
+                                value={(Number(holeScore.numberOfStrokes) ?? 0) + (Number(holeScore.numberOfPutts) ?? 0)}
+                                disabled
+                                aria-label="score">
+                        </td>
+                        <td>
                             <input class="score-checkbox form-check-input"
                                 type="checkbox"
                                 bind:checked={holeScore.stats.greenInRegulation}>
                         </td>
-                        <td class="td-20">
+                        <td>
                             <input class="score-checkbox form-check-input"
                                 type="checkbox"
                                 bind:checked={holeScore.stats.greenLightDrive}>
                         </td>
-                        <td class="td-20">
+                        <td>
                             {#if holeScore.stats && holeScore.stats.greenInRegulation}
                                 <span class="disabled-checkbox-placeholder">-</span>
                             {:else}
@@ -361,9 +365,6 @@
     }
     .stats-control {
         border: 0;
-    }
-    .shot-entry {
-        width: 400px;
     }
     .shot-coords {
         font-size: 9pt;
