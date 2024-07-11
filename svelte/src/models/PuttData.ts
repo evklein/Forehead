@@ -1,5 +1,5 @@
 export interface PuttData {
-    strokeNumber: number;
+    strokeNumber?: number;
     distance?: number;
     roundId?: number;
     holeNumber?: number;

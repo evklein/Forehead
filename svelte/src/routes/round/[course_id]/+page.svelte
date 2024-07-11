@@ -47,21 +47,16 @@
         holes = await api.fetchHoles(course.courseId);
 
         if (course && course.numberOfHoles) {
-            holeScores = Array.from(
-                { length: course.numberOfHoles },
-                (_, index) => {
-                    return {
-                        numberOfStrokes: 0,
-                        numberOfPutts: 0,
-                        stats: {
-                            greenInRegulation: false,
-                            greenLightDrive: false,
-                        },
-                        strokes: [],
-                        putts: [],
-                    };
-                },
-            );
+            holeScores = Array.from({ length: course.numberOfHoles }, (_, index) => {
+                return {
+                    stats: {
+                        greenInRegulation: false,
+                        greenLightDrive: false,
+                    },
+                    fullShots: [],
+                    putts: [],
+                };
+            });
         }
     });
 
@@ -77,29 +72,11 @@
 </script>
 
 {#if entryStage === RoundStage.Start}
-    <RoundStart
-        {course}
-        bind:round
-        {tees}
-        handleAdvance={() => (entryStage = RoundStage.HoleEntry)}
-    />
+    <RoundStart {course} bind:round {tees} handleAdvance={() => (entryStage = RoundStage.HoleEntry)} />
 {:else if entryStage === RoundStage.HoleEntry}
-    <HoleEntry
-        {round}
-        {course}
-        {holes}
-        {holeScores}
-        handleAdvance={advanceToFinalizePage}
-    />
+    <HoleEntry {round} {course} {holes} {holeScores} handleAdvance={advanceToFinalizePage} courseTees={tees} />
 {:else if entryStage === RoundStage.Finalize}
-    <Finalize
-        {course}
-        {round}
-        {holes}
-        stats={roundStats}
-        strokes={roundStrokes}
-        putts={roundPutts}
-    />
+    <Finalize {course} {round} {holes} stats={roundStats} strokes={roundStrokes} putts={roundPutts} />
 {/if}
 
 <style>

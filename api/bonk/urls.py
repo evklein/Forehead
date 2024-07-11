@@ -22,5 +22,5 @@ urlpatterns = [
     path("round/", include("round.urls")),
     path("course/", include("course.urls")),
     path("practice/", include("practice.urls")),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]

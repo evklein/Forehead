@@ -34,7 +34,7 @@ def savePracticeGame(request):
             for key, value in data.items():
                 setattr(game, key, value)
             
-            game.save()
+            stroke.save()
             
             return JsonResponse({'message': 'Data saved successfully'})
         except Course.DoesNotExist:

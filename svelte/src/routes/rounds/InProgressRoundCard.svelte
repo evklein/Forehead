@@ -15,7 +15,9 @@
         <h4 class="card-title h5 h4-sm">
             {round.datePlayed} at <b>{course?.name}</b>
         </h4>
-        <p class="card-text">Example text</p>
+        <a class="btn btn-success" href="/round/continue/{round.id}">
+            Continue &nbsp;<i class="fa-solid fa-arrow-right"></i>
+        </a>
     </div>
 </div>
 

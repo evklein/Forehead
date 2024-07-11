@@ -1,5 +1,5 @@
 export interface StrokeData {
-    strokeNumber: number;
+    strokeNumber?: number;
     club?: string;
     distance?: number;
     startCoordinate?: [number, number];
