@@ -3,7 +3,7 @@
 
 <svelte:head>
     <title>Home</title>
-    <meta name="description" content="Bonk" />
+    <meta name="description" content="Forehead" />
 </svelte:head>
 
 <div>
@@ -11,7 +11,7 @@
         <h3>
             <span class="welcome">
                 <p>
-                    Welcome to <b class="bonk">Bonk</b>, an open Golf analytics solution.
+                    Welcome to <b class="forehead">Forehead</b>, an open Golf analytics solution.
                 </p>
             </span>
         </h3>
@@ -59,7 +59,7 @@
         flex: 0.6;
     }
 
-    .bonk {
+    .forehead {
         color: green;
     }
 
