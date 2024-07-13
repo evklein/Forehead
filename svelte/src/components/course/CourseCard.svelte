@@ -4,13 +4,11 @@
     export let course: CourseData;
 </script>
 
-<div class="col-4">
+<div class="col-xs-12 col-lg-4">
     <div class="card">
         <img class="card-img-top" src={course.imageUrl} alt="Course" />
-        <span
-            class="public-badge badge text-bg-{course.public
-                ? 'success'
-                : 'danger'}">{course.public ? `Public` : `Private`}</span
+        <span class="public-badge badge text-bg-{course.public ? 'success' : 'danger'}"
+            >{course.public ? `Public` : `Private`}</span
         >
         <span class="par-badge badge text-bg-success">Par {course.par}</span>
         <div class="card-body">
@@ -38,5 +36,8 @@
     }
     .par-badge {
         right: 10px;
+    }
+    .card {
+        margin-bottom: 10px;
     }
 </style>

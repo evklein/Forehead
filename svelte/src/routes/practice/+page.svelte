@@ -3,6 +3,7 @@
 </script>
 
 <div class="row align-items-start">
+    <h2>Practice</h2>
     <PracticeModeCard
         mode="Range Record"
         description="Hit range balls and collect shot data."

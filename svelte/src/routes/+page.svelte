@@ -11,14 +11,13 @@
         <h3>
             <span class="welcome">
                 <p>
-                    Welcome to <b class="bonk">Bonk</b>, an open Golf analytics
-                    solution.
+                    Welcome to <b class="bonk">Bonk</b>, an open Golf analytics solution.
                 </p>
             </span>
         </h3>
     </div>
     <div class="row align-items-start">
-        <div class="col-4">
+        <div class="col-xs-12 col-lg-4">
             <a href="/rounds">
                 <div class="card">
                     <img
@@ -28,14 +27,12 @@
                     />
                     <div class="card-body">
                         <h5 class="card-title">Play</h5>
-                        <p class="card-text">
-                            Play a round of golf. Record the data for analytics.
-                        </p>
+                        <p class="card-text">Play a round of golf. Record the data for analytics.</p>
                     </div>
                 </div>
             </a>
         </div>
-        <div class="col-4">
+        <div class="col-xs-12 col-lg-4">
             <a href="/practice">
                 <div class="card">
                     <img
@@ -45,9 +42,7 @@
                     />
                     <div class="card-body">
                         <h5 class="card-title">Practice</h5>
-                        <p class="card-text">
-                            Practice different parts of the game.
-                        </p>
+                        <p class="card-text">Practice different parts of the game.</p>
                     </div>
                 </div>
             </a>
@@ -70,5 +65,17 @@
 
     a {
         text-decoration: none;
+    }
+
+    .card {
+        z-index: 1;
+        width: 100%;
+        margin: 10px 0;
+        transition: width 0.2s ease; /* Smooth transition for width change */
+    }
+
+    .card:hover {
+        width: 105%;
+        z-index: 10;
     }
 </style>

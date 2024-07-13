@@ -11,18 +11,9 @@
 
     $: holeScores = scrambleGameData.holeChips.map((_, i) => getHoleScore(i));
     $: holeBorders = holeScores.map((score) => getBorderForHoleScore(score));
-    $: totalChips = scrambleGameData.holeChips.reduce(
-        (total, nextValue) => total + Number(nextValue),
-        0,
-    );
-    $: totalPutts = scrambleGameData.holePutts.reduce(
-        (total, nextValue) => total + Number(nextValue),
-        0,
-    );
-    $: totalYards = scrambleGameData.holeYardages.reduce(
-        (total, nextValue) => total + nextValue,
-        0,
-    );
+    $: totalChips = scrambleGameData.holeChips.reduce((total, nextValue) => total + Number(nextValue), 0);
+    $: totalPutts = scrambleGameData.holePutts.reduce((total, nextValue) => total + Number(nextValue), 0);
+    $: totalYards = scrambleGameData.holeYardages.reduce((total, nextValue) => total + nextValue, 0);
     $: totalScore = totalChips + totalPutts;
     $: gameSavedStatus = 'Game not saved';
 
@@ -33,9 +24,7 @@
         let newHoleYardages = [...scrambleGameData.holeYardages]; // Copy existing holeYardages
 
         for (let i = 0; i < 18; i += 3) {
-            let nextMiddleYardage =
-                Math.floor(Math.random() * (maxYardage - minYardage + 1)) +
-                minYardage;
+            let nextMiddleYardage = Math.floor(Math.random() * (maxYardage - minYardage + 1)) + minYardage;
             newHoleYardages[i] = nextMiddleYardage - 1;
             newHoleYardages[i + 1] = nextMiddleYardage;
             newHoleYardages[i + 2] = nextMiddleYardage + 1;
@@ -71,6 +60,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
+                <h2 class="card-title">Up & Down</h2>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -86,10 +76,7 @@
                             <td>Score</td>
                             {#each { length: 18 } as _, i}
                                 <td>
-                                    <span
-                                        class="score-number"
-                                        style={holeBorders[i]}
-                                    >
+                                    <span class="score-number" style={holeBorders[i]}>
                                         {holeScores[i]}
                                     </span>
                                 </td>
@@ -118,9 +105,7 @@
                                     <input
                                         class="form-control-sm"
                                         type="text"
-                                        bind:value={scrambleGameData.holeChips[
-                                            i
-                                        ]}
+                                        bind:value={scrambleGameData.holeChips[i]}
                                     />
                                 </td>
                             {/each}
@@ -133,9 +118,7 @@
                                     <input
                                         class="form-control-sm"
                                         type="text"
-                                        bind:value={scrambleGameData.holePutts[
-                                            i
-                                        ]}
+                                        bind:value={scrambleGameData.holePutts[i]}
                                     />
                                 </td>
                             {/each}
@@ -143,20 +126,38 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="lower-buttons btn-group">
+                    <button type="button" class="btn btn-lg btn-success" on:click={saveScrambleRound}>
+                        <i class="fa-solid fa-floppy-disk"></i> &nbsp;Save game
+                    </button>
+                    <button type="button" class="btn btn-lg btn-secondary"> Restart </button>
+                </div>
             </div>
-            <div class="lower-buttons">
-                <button
-                    type="button"
-                    class="btn btn-lg btn-primary"
-                    on:click={saveScrambleRound}>Save game</button
-                >
-                {gameSavedStatus}
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card mt-3">
+            <div class="card-body">
+                <h4 class="card-title"><i class="fa-solid fa-star"></i> &nbsp;Recent Scores</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Gross</th>
+                            <th>Net</th>
+                        </tr>
+                    </thead>
+                    <tbody> </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
 <style>
+    .table {
+        overflow-x: scroll;
+    }
     .score-number {
         padding: 0px 5px;
     }
@@ -169,11 +170,5 @@
     }
     td > input {
         width: 30px;
-    }
-    .lower-buttons {
-        display: flex;
-        flex-direction: column;
-        width: 300px;
-        padding: 0 20px;
     }
 </style>

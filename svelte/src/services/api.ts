@@ -203,12 +203,41 @@ export async function fetchInProgressRounds() {
     }
 }
 
-export async function saveRound(
+export async function saveNewRound(
     roundData: RoundData,
     courseId: number,
     teeId: number,
 ): Promise<number> {
     const endpoint = `/round/new/?course_id=${courseId}&tee_id=${teeId}`;
+    let requestBody: string = JSON.stringify({
+        nickname: roundData.nickname,
+        date_played: roundData.datePlayed?.toISOString().split('T')[0],
+        tee_time: roundData.teeTime,
+        finish_time: roundData.finishTime,
+        holes_completed: roundData.holesCompleted,
+        group_makeup: roundData.groupMakeup,
+        mobility: roundData.mobility,
+        round_counts_toward_hci: roundData.roundCountsTowardHci,
+        notes: roundData.notes,
+    });
+    try {
+        let response = await apiHelpers.post(
+            BONK_API_URL,
+            endpoint,
+            requestBody,
+        );
+        return response['round_id'];
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return -1;
+    }
+}
+
+export async function updateRound(
+    roundData: RoundData,
+): Promise<number> {
+    const endpoint = `/round/${roundData.id}/update/`;
     let requestBody: string = JSON.stringify({
         nickname: roundData.nickname,
         date_played: roundData.datePlayed?.toISOString().split('T')[0],
@@ -405,8 +434,6 @@ export async function fetchRoundDetails(roundId: number): Promise<RoundData | nu
     const endpoint = `/round/${roundId}/`;
     try {
         const rawData = await apiHelpers.get(BONK_API_URL, endpoint);
-        console.log("DATA FETCHED");
-        console.log(rawData);
         let roundData = {
             datePlayed: new Date(rawData['fields']['date_played']),
             groupMakeup: rawData['fields']['group_makeup'],
@@ -417,7 +444,8 @@ export async function fetchRoundDetails(roundId: number): Promise<RoundData | nu
             nickname: rawData['fields']['nickname'],
             playedTeeId: rawData['fields']['played_tee'],
             roundCountsTowardHci: rawData['fields']['round_counts_toward_hci'],
-            courseId: rawData['fields']['course']
+            courseId: rawData['fields']['course'],
+            id: rawData['pk']
         } as RoundData;
         return roundData;
     } catch (error) {

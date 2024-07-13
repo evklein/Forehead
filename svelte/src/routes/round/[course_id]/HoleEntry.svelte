@@ -5,7 +5,6 @@
     import { onMount } from 'svelte';
     import type { HoleScore } from '../../../models/HoleScore';
     import Map from '../../../components/shared/Map.svelte';
-    import InputDirector from '../../../components/round/InputDirector.svelte';
     import { MapMarkerChoice } from '../../../components/shared/MapMarkerChoice';
     import type { CourseData } from '../../../models/CourseData';
     import type { RoundData } from '../../../models/RoundData';
@@ -18,11 +17,15 @@
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
 
-    let selectedStrokeIndex: number | undefined = undefined;
+    let selectedStrokeCoordinateIndex: number = -1;
+    let selectedStrokeCoordinateStart: boolean = true;
     let currentHoleIndex: number = 0;
     let currentHole: HoleData;
     let currentHoleScore: HoleScore;
-    let selectedPoints: [number, number][] = [];
+
+    $: selectedPointsForMap = currentHoleScore?.fullShots
+        .map((fullShot) => [fullShot.startCoordinate, fullShot.endCoordinate])
+        .flat() as [number, number][];
 
     onMount(() => {
         currentHole = holes[currentHoleIndex];
@@ -33,31 +36,28 @@
         currentHoleIndex++;
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
-        selectedPoints = [];
     }
 
     function decrementCurrentHoleNumber() {
         currentHoleIndex--;
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
-        selectedPoints = [];
     }
 
     function selectPointOnMap(coordinates: [number, number]) {
-        console.log('Selecting point on map.');
-        console.log(selectedPoints);
-        console.log('selectedStrokeIndex = ' + selectedStrokeIndex);
-        if (selectedStrokeIndex == undefined) {
-            selectedPoints = [...selectedPoints, coordinates];
-        } else {
-            console.log('Replacing index!');
-            selectedPoints[selectedStrokeIndex] = coordinates;
-            selectedPoints = selectedPoints;
+        if (selectedStrokeCoordinateIndex !== -1) {
+            console.log('Placing coordinates: ' + coordinates);
+            if (selectedStrokeCoordinateStart) {
+                console.log('Setting start coordinates for stroke ' + selectedStrokeCoordinateIndex);
+                currentHoleScore.fullShots[selectedStrokeCoordinateIndex].startCoordinate = coordinates;
+            } else {
+                console.log('Setting end coordinates for stroke ' + selectedStrokeCoordinateIndex);
+                currentHoleScore.fullShots[selectedStrokeCoordinateIndex].endCoordinate = coordinates;
+            }
         }
 
-        selectedStrokeIndex = undefined;
-        console.log('New point selected.');
-        console.log(selectedPoints);
+        selectedStrokeCoordinateIndex = -1;
+        selectedStrokeCoordinateStart = true;
     }
 
     function getCurrentInstructions(): string {
@@ -83,9 +83,9 @@
         return ``;
     }
 
-    function setTargetCoordinate(strokeIndex: number) {
-        console.log('Set target coordinate element for stroke #' + strokeIndex + 1);
-        selectedStrokeIndex = strokeIndex;
+    function setTargetCoordinate(strokeIndex: number, start: boolean) {
+        selectedStrokeCoordinateIndex = strokeIndex;
+        selectedStrokeCoordinateStart = start;
     }
 </script>
 
@@ -99,8 +99,6 @@
             handleGoToNextHole={incrementCurrentHoleNumber}
             handleGoToPreviousHole={decrementCurrentHoleNumber}
             {handleAdvance}
-            {selectedPoints}
-            handleSelectCurrentPosition={selectPointOnMap}
             handleSetTargetCoordinate={setTargetCoordinate}
             {courseTees}
         />
@@ -117,8 +115,7 @@
             {#key currentHoleIndex}
                 <Map
                     focusBounds={currentHole.boundPoints}
-                    bind:selectedBounds={selectedPoints}
-                    specialPoints={selectedPoints}
+                    specialPoints={selectedPointsForMap}
                     highlightSelectedbounds={true}
                     handleSelectPointOnMap={selectPointOnMap}
                     markerChoice={MapMarkerChoice.ShotTracer}

@@ -6,6 +6,7 @@ urlpatterns = [
     path("new/", views.saveNewRound, name="saveNewRound"),
     path("in-progress/", views.fetchRoundsInProgress, name="fetchRoundsInProgress"),
     path("<int:round_id>/", views.fetchRound, name="fetchRound"),
+    path("<int:round_id>/update/", views.updateRound, name="updateRound"),
     path("<int:round_id>/stats/", views.fetchRoundHoleStats, name="fetchRoundHoleStats"),
     path("<int:round_id>/strokes/", views.fetchRoundStrokes, name="fetchRoundStrokes"),
     path("<int:round_id>/putts/", views.fetchRoundPutts, name="fetchRoundPutts"),

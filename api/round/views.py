@@ -83,6 +83,25 @@ def saveNewRound(request):
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
 
 @csrf_exempt
+def updateRound(request, round_id):
+    if request.method == 'POST':
+        try:
+            round = Round.objects.get(pk=round_id)
+            data = json.loads(request.body)
+            for key, value in data.items():
+                setattr(round, key, value)
+            round.in_progress = True
+            
+            round.save()
+
+            return JsonResponse({'message': 'Data saved successfully', 'round_id': round.id})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+
+@csrf_exempt
 def saveHoleStats(request, round_id, hole_id):
     if request.method == 'POST':
         try:

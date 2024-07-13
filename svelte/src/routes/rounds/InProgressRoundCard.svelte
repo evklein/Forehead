@@ -7,10 +7,7 @@
 </script>
 
 <div class="card flex-row">
-    <img
-        class="card-img-left example-card-img-responsive"
-        src={course?.imageUrl}
-    />
+    <img class="card-img-left example-card-img-responsive" src={course?.imageUrl} />
     <div class="card-body">
         <h4 class="card-title h5 h4-sm">
             {round.datePlayed} at <b>{course?.name}</b>
@@ -23,9 +20,15 @@
 
 <style>
     .card {
-        margin: 20px;
+        margin: 10px 0;
     }
     img {
         max-width: 200px;
+    }
+
+    @media only screen and (max-width: 799px) {
+        img {
+            width: 110px;
+        }
     }
 </style>
