@@ -58,15 +58,36 @@
         holeScore.putts = holeScore.putts;
     }
 
-    function getFormattedCoordinateText(strokeIndex: number, start: boolean): string {
-        return start
-            ? `[${holeScore?.fullShots?.[strokeIndex].startCoordinate?.[0].toFixed(5)}, ${holeScore?.fullShots?.[strokeIndex].startCoordinate?.[1].toFixed(5)}]`
-            : `[${holeScore?.fullShots?.[strokeIndex].endCoordinate?.[0].toFixed(5)}, ${holeScore?.fullShots?.[strokeIndex].endCoordinate?.[1].toFixed(5)}]`;
-
-        return strokeIndex === 0 ? 'Set Tee Shot Coordinates' : 'Set Coordinates';
-    }
-
-    function getFormattedDistanceToGreen(strokeIndex: number) {
+    $: coordinateButtonClass = (strokeIndex: number) => {
+        let previousShot = holeScore.fullShots[strokeIndex - 1];
+        if (strokeIndex === 0) return 'btn-warning';
+        if (previousShot && previousShot.penalty) {
+            return 'btn-danger';
+        }
+        return 'btn-primary';
+    };
+    $: formattedStartCoordinate = (strokeIndex: number) => {
+        let shot = holeScore.fullShots[strokeIndex];
+        if (!shot.startCoordinate) {
+            if (strokeIndex === 0) return 'Set tee-shot-location';
+            let previousShot = holeScore.fullShots[strokeIndex - 1];
+            if (previousShot && previousShot.penalty) {
+                return 'Set drop location';
+            }
+            return 'Set start location';
+        }
+        console.log('Formatting!');
+        console.log(shot);
+        return `[${shot.startCoordinate?.[0].toFixed(5)}, ${shot.startCoordinate?.[1].toFixed(5)}]`;
+    };
+    $: formattedEndCoordinate = (strokeIndex: number) => {
+        let shot = holeScore.fullShots[strokeIndex];
+        if (!shot.endCoordinate) {
+            return 'Set landing location';
+        }
+        return `[${shot.endCoordinate?.[0].toFixed(5)}, ${shot.endCoordinate?.[1].toFixed(5)}]`;
+    };
+    $: getFormattedDistanceToGreen = (strokeIndex: number) => {
         let fullShot = holeScore.fullShots[strokeIndex];
         if (fullShot && fullShot.startCoordinate && hole.centerGreenPoint) {
             return (
@@ -81,9 +102,9 @@
             );
         }
         return '-';
-    }
+    };
 
-    function getFormattedDistanceForFullShot(strokeIndex: number) {
+    $: getFormattedDistanceForFullShot = (strokeIndex: number) => {
         let fullShot = holeScore.fullShots[strokeIndex];
         if (fullShot.startCoordinate && fullShot.endCoordinate && hole.centerGreenPoint) {
             return (
@@ -98,7 +119,7 @@
             );
         }
         return '-';
-    }
+    };
 
     async function saveAll() {
         if (round.id && hole.id) {
@@ -122,8 +143,8 @@
 
         holeScore.putts.forEach(async (putt, index) => {
             if (round.id && hole.id) {
-                (putt.strokeNumber = holeScore.fullShots.length + index + 1),
-                    await api.savePutt(round.id, hole.id, putt);
+                putt.strokeNumber = holeScore.fullShots.length + index + 1;
+                await api.savePutt(round.id, hole.id, putt);
             }
         });
     }
@@ -297,30 +318,24 @@
                                             ? 'penalty-cell'
                                             : null}"
                                     >
-                                        <!-- {#key selectedPoints} -->
                                         <button
-                                            class="btn btn-small {strokeIndex === 0
-                                                ? 'btn-warning'
-                                                : 'btn-primary'} coordinate"
+                                            class="btn btn-small {coordinateButtonClass(strokeIndex)} coordinate"
                                             on:click={() => handleSetTargetCoordinate(strokeIndex, true)}
                                         >
-                                            {getFormattedCoordinateText(strokeIndex, true)}
+                                            {formattedStartCoordinate(strokeIndex)}
                                         </button>
-                                        <!-- {/key} -->
                                     </td>
                                     <td
                                         class="shot-coords {holeScore.fullShots[strokeIndex].penalty
                                             ? 'penalty-cell'
                                             : null}"
                                     >
-                                        <!-- {#key selectedPoints} -->
                                         <button
                                             class="btn btn-small btn-primary coordinate"
                                             on:click={() => handleSetTargetCoordinate(strokeIndex, false)}
                                         >
-                                            {getFormattedCoordinateText(strokeIndex, false)}
+                                            {formattedEndCoordinate(strokeIndex)}
                                         </button>
-                                        <!-- {/key} -->
                                     </td>
                                     <td>
                                         <input

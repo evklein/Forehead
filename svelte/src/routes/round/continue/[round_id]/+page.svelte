@@ -37,6 +37,7 @@
             let roundStats = await api.fetchRoundHoleStats(roundId);
             let roundStrokes = await api.fetchRoundStrokes(roundId);
             let roundPutts = await api.fetchRoundPutts(roundId);
+
             let courseDetails = await api.fetchCourseDetails(round.courseId ?? -1);
             if (courseDetails) {
                 course = courseDetails;
@@ -55,7 +56,7 @@
                                 greenLightDrive: false,
                             },
                             fullShots: roundStrokes.filter((s) => s.holeNumber === i + 1),
-                            putts: roundStats.filter((s) => s.holeNumber === i + 1),
+                            putts: roundPutts.filter((s) => s.holeNumber === i + 1),
                         },
                     ];
                 }

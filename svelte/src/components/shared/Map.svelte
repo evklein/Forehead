@@ -65,7 +65,6 @@
     }
 
     async function placeMarkers(markerCoordinates: [number, number][]) {
-        console.log('Placing all markers: ' + markerCoordinates);
         const L = await import('leaflet');
         await import('leaflet/dist/leaflet.css');
 

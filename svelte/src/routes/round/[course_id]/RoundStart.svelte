@@ -12,13 +12,10 @@
     export let handleAdvance: Function;
 
     async function advance() {
-        console.log('ADVANCING!!!');
         round.id;
         if (round.id) {
-            console.log(round.id);
             await api.updateRound(round);
         } else {
-            console.log(round.id);
             round.id = await api.saveNewRound(round, course.courseId);
         }
         handleAdvance();

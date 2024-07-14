@@ -14,8 +14,6 @@ const FOREHEAD_API_URL =
     import.meta.env.VITE_BONK_API_URL ?? 'http://localhost:8000';
 
 export async function fetchAllCourses(): Promise<CourseData[] | null> {
-    console.log('AHHHh');
-    console.log(FOREHEAD_API_URL);
     const endpoint = `/course/all/`;
     try {
         const rawData: any = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
@@ -274,7 +272,6 @@ export async function saveHoleStats(
         gld: stats.greenLightDrive,
         scrambling: stats.scrambling,
     });
-    console.log(requestBody);
     try {
         await apiHelpers.post(FOREHEAD_API_URL, endpoint, requestBody);
     } catch (error) {
@@ -517,7 +514,7 @@ export async function fetchRoundPutts(roundId: number): Promise<PuttData[] | nul
                 distance: nextPutt['fields']['distance'],
                 holeNumber: nextPutt['fields']['hole'],
                 roundId: nextPutt['fields']['rnd']
-            })
+            });
         }
         return putts;
     } catch (error) {
@@ -533,16 +530,13 @@ export async function getRecentUpDownRounds(): Promise<ScrambleRoundData[] | nul
         const rawData = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
         let roundData: ScrambleRoundData[] = [];
         for (let i = 0; i < rawData.length; i++) {
-            console.log('Getting round data for ' + i);
             let nextRound = rawData[i];
-            console.log(nextRound);
             roundData.push({
                 date: new Date(nextRound['date']),
                 total: nextRound['totalShots'],
                 yards: nextRound['totalYards']
             });
         }
-        console.log(roundData);
         return roundData;
     } catch (error) {
         console.error(`${endpoint}: request failed.`);

@@ -14,18 +14,12 @@
     onMount(async () => {
         try {
             rounds = (await api.fetchInProgressRounds()) ?? [];
-            console.log('Rounds fetched:', rounds);
 
             let uniqueCourseIds = [...new Set(rounds.map((r) => r.courseId))];
-            let courseDataPromises = uniqueCourseIds.map((courseId) =>
-                api.fetchCourseDetails(courseId ?? -1),
-            );
+            let courseDataPromises = uniqueCourseIds.map((courseId) => api.fetchCourseDetails(courseId ?? -1));
 
             const fetchedCourses = await Promise.all(courseDataPromises);
-            courses = fetchedCourses.filter(
-                (course) => course !== undefined,
-            ) as CourseData[];
-            console.log('Courses fetched:', courses);
+            courses = fetchedCourses.filter((course) => course !== undefined) as CourseData[];
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -35,7 +29,6 @@
 
     function getCourseForRound(round: RoundData): CourseData | undefined {
         let selectedCourse = courses.find((c) => c.courseId === round.courseId);
-        console.log('Selected course for round:', round, selectedCourse);
         return selectedCourse;
     }
 </script>
@@ -56,10 +49,7 @@
             <span class="no-rounds">No in-progress rounds found.</span>
         {:else}
             {#each rounds as round}
-                <InProgressRoundCard
-                    {round}
-                    course={getCourseForRound(round)}
-                />
+                <InProgressRoundCard {round} course={getCourseForRound(round)} />
             {/each}
         {/if}
     </div>

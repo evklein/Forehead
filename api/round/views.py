@@ -109,7 +109,11 @@ def saveHoleStats(request, round_id, hole_id):
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
             stats = HoleStats(rnd=rnd, hole=hole)
-            print("SAVING NEW HOLE STATS")
+            
+            existing_stats = HoleStats.objects.filter(rnd=rnd, hole=hole)
+            if existing_stats is not None:
+                stats = existing_stats[0]
+
             for key, value in data.items():
                 sanitized_val = value
                 if value == 'true':
@@ -118,7 +122,6 @@ def saveHoleStats(request, round_id, hole_id):
                     sanitized_val = False
                 setattr(stats, key, sanitized_val)
             
-            print("SAVING NEW HOLE STATS - done")
             stats.save()
 
             return JsonResponse({'message': 'Data saved successfully'})
@@ -134,18 +137,12 @@ def saveStroke(request, round_id, hole_id):
             rnd = Round.objects.get(pk=round_id)
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
-
-            print(data)
-            print(str(data['stroke_number']))
-            print("Finding existing stroke")
-            existing_stroke = Stroke.objects.filter(rnd=rnd, hole=hole, stroke_number=data['stroke_number'])
-            print(existing_stroke)
-            if existing_stroke is not None:
-                print("Existing stroke found.")
-                existing_stroke.delete()
-
-            print("Saving new stroke now.")
             stroke = Stroke(rnd=rnd, hole=hole)
+
+            existing_strokes = Stroke.objects.filter(rnd=rnd, hole=hole, stroke_number=data['stroke_number'])
+            if existing_strokes is not None:
+                stroke = existing_strokes[0]
+
             for key, value in data.items():
                 setattr(stroke, key, value)
             
@@ -159,6 +156,13 @@ def saveStroke(request, round_id, hole_id):
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import time
+from .models import Round, Hole, Putt
+from django.db import OperationalError
+
 @csrf_exempt
 def savePutt(request, round_id, hole_id):
     if request.method == 'POST':
@@ -166,13 +170,27 @@ def savePutt(request, round_id, hole_id):
             rnd = Round.objects.get(pk=round_id)
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
-            putt = Putt(rnd=rnd, hole=hole)
-            for key, value in data.items():
-                setattr(putt, key, value)
-            
-            putt.save()
 
-            return JsonResponse({'message': 'Data saved successfully'})
+            retry_attempts = 5
+            for attempt in range(retry_attempts):
+                try:
+                    putt, created = Putt.objects.update_or_create(
+                        rnd=rnd, 
+                        hole=hole, 
+                        stroke_number=data['stroke_number'],
+                        defaults=data
+                    )
+                    return JsonResponse({'message': 'Data saved successfully', 'created': created})
+                except OperationalError as e:
+                    if 'database is locked' in str(e) and attempt < retry_attempts - 1:
+                        time.sleep(2)  # wait for 2 seconds before retrying
+                    else:
+                        raise
+
+        except Round.DoesNotExist:
+            return JsonResponse({'error': 'Round not found'}, status=404)
+        except Hole.DoesNotExist:
+            return JsonResponse({'error': 'Hole not found'}, status=404)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:

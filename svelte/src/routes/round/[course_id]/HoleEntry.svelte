@@ -46,13 +46,23 @@
 
     function selectPointOnMap(coordinates: [number, number]) {
         if (selectedStrokeCoordinateIndex !== -1) {
-            console.log('Placing coordinates: ' + coordinates);
+            console.log(
+                'Setting coordinates for ' + selectedStrokeCoordinateIndex + '.' + selectedStrokeCoordinateStart,
+            );
             if (selectedStrokeCoordinateStart) {
-                console.log('Setting start coordinates for stroke ' + selectedStrokeCoordinateIndex);
                 currentHoleScore.fullShots[selectedStrokeCoordinateIndex].startCoordinate = coordinates;
+
+                let previousShot = currentHoleScore.fullShots[selectedStrokeCoordinateIndex - 1];
+                if (previousShot && !previousShot.penalty) {
+                    previousShot.endCoordinate = coordinates;
+                }
             } else {
-                console.log('Setting end coordinates for stroke ' + selectedStrokeCoordinateIndex);
                 currentHoleScore.fullShots[selectedStrokeCoordinateIndex].endCoordinate = coordinates;
+
+                let nextShot = currentHoleScore.fullShots[selectedStrokeCoordinateIndex + 1];
+                if (nextShot && !nextShot.penalty) {
+                    nextShot.startCoordinate = coordinates;
+                }
             }
         }
 

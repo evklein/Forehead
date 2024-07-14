@@ -13,11 +13,7 @@
     export let putts: StrokeData[];
 
     function getCumulativeStrokeForHole(holeNumber: number): number {
-        console.log(strokes);
-        return (
-            strokes.filter((s) => s.holeNumber === holeNumber).length +
-            getCumultativePuttsForHole(holeNumber)
-        );
+        return strokes.filter((s) => s.holeNumber === holeNumber).length + getCumultativePuttsForHole(holeNumber);
     }
 
     function getCumultativePuttsForHole(holeNumber: number): number {
@@ -32,30 +28,20 @@
         let score = getCumulativeStrokeForHole(hole.holeNumber);
         let par = hole.par;
 
-        if (score <= par - 2)
-            return 'border: 3px double white; border-radius: 20px;';
-        if (score === par - 1)
-            return 'border: 2px solid white; border-radius: 20px;';
+        if (score <= par - 2) return 'border: 3px double white; border-radius: 20px;';
+        if (score === par - 1) return 'border: 2px solid white; border-radius: 20px;';
         if (score === par) return '';
         if (score === par + 1) return 'border: 1px solid white';
         return 'border: 3px double white';
     }
 
     function getFinalScore() {
-        return holes.reduce(
-            (total, nextHole) =>
-                total + getCumulativeStrokeForHole(nextHole.holeNumber),
-            0,
-        );
+        return holes.reduce((total, nextHole) => total + getCumulativeStrokeForHole(nextHole.holeNumber), 0);
     }
 
     function getTotalGir() {
         let totalGir = holes.reduce(
-            (total, nextHole) =>
-                total +
-                (getStatsForHole(nextHole.holeNumber)?.greenInRegulation
-                    ? 1
-                    : 0),
+            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenInRegulation ? 1 : 0),
             0,
         );
         return totalGir;
@@ -63,35 +49,24 @@
 
     function getTotalGld() {
         let totalGld = holes.reduce(
-            (total, nextHole) =>
-                total +
-                (getStatsForHole(nextHole.holeNumber)?.greenLightDrive ? 1 : 0),
+            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenLightDrive ? 1 : 0),
             0,
         );
-        let numberOfParThrees = holes.reduce(
-            (total, nextHole) => total + (nextHole.par === 3 ? 1 : 0),
-            0,
-        );
+        let numberOfParThrees = holes.reduce((total, nextHole) => total + (nextHole.par === 3 ? 1 : 0), 0);
         return `${totalGld}/${round.holesCompleted - numberOfParThrees}`;
     }
 
     function getTotalScrambling() {
         let totalGir = getTotalGir();
         let totalScrambling = holes.reduce(
-            (total, nextHole) =>
-                total +
-                (getStatsForHole(nextHole.holeNumber)?.scrambling ? 1 : 0),
+            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.scrambling ? 1 : 0),
             0,
         );
         return `${totalScrambling}/${round.holesCompleted - totalGir}`;
     }
 
     function getTotalPutts() {
-        return holes.reduce(
-            (total, nextHole) =>
-                total + getCumultativePuttsForHole(nextHole.holeNumber),
-            0,
-        );
+        return holes.reduce((total, nextHole) => total + getCumultativePuttsForHole(nextHole.holeNumber), 0);
     }
 </script>
 
@@ -115,13 +90,8 @@
                                 <td>Score</td>
                                 {#each holes as hole}
                                     <td>
-                                        <span
-                                            class="score-number"
-                                            style={getBorderForHoleScore(hole)}
-                                        >
-                                            {getCumulativeStrokeForHole(
-                                                hole.holeNumber,
-                                            )}
+                                        <span class="score-number" style={getBorderForHoleScore(hole)}>
+                                            {getCumulativeStrokeForHole(hole.holeNumber)}
                                         </span>
                                     </td>
                                 {/each}
@@ -134,11 +104,7 @@
                             <tr>
                                 <td>Putts</td>
                                 {#each holes as hole}
-                                    <td
-                                        >{getCumultativePuttsForHole(
-                                            hole.holeNumber,
-                                        )}</td
-                                    >
+                                    <td>{getCumultativePuttsForHole(hole.holeNumber)}</td>
                                 {/each}
                                 <td>
                                     <b>
@@ -153,16 +119,13 @@
                                         <input
                                             type="checkbox"
                                             class="form-check-input"
-                                            checked={getStatsForHole(
-                                                hole.holeNumber,
-                                            )?.greenInRegulation}
+                                            checked={getStatsForHole(hole.holeNumber)?.greenInRegulation}
                                             disabled
                                         />
                                     </td>
                                 {/each}
                                 <td>
-                                    <b>{getTotalGir()}/{round.holesCompleted}</b
-                                    >
+                                    <b>{getTotalGir()}/{round.holesCompleted}</b>
                                 </td>
                             </tr>
                             <tr>
@@ -173,9 +136,7 @@
                                             <input
                                                 type="checkbox"
                                                 class="form-check-input"
-                                                checked={getStatsForHole(
-                                                    hole.holeNumber,
-                                                )?.greenLightDrive}
+                                                checked={getStatsForHole(hole.holeNumber)?.greenLightDrive}
                                                 disabled
                                             />
                                         {:else}
@@ -194,9 +155,7 @@
                                             <input
                                                 type="checkbox"
                                                 class="form-check-input"
-                                                checked={getStatsForHole(
-                                                    hole.holeNumber,
-                                                )?.scrambling}
+                                                checked={getStatsForHole(hole.holeNumber)?.scrambling}
                                                 disabled
                                             />
                                         </td>
