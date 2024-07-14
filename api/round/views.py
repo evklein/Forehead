@@ -134,11 +134,24 @@ def saveStroke(request, round_id, hole_id):
             rnd = Round.objects.get(pk=round_id)
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
+
+            print(data)
+            print(str(data['stroke_number']))
+            print("Finding existing stroke")
+            existing_stroke = Stroke.objects.filter(rnd=rnd, hole=hole, stroke_number=data['stroke_number'])
+            print(existing_stroke)
+            if existing_stroke is not None:
+                print("Existing stroke found.")
+                existing_stroke.delete()
+
+            print("Saving new stroke now.")
             stroke = Stroke(rnd=rnd, hole=hole)
             for key, value in data.items():
                 setattr(stroke, key, value)
             
+            print(stroke)
             stroke.save()
+            print("Stroke saved")
 
             return JsonResponse({'message': 'Data saved successfully'})
         except json.JSONDecodeError:

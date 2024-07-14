@@ -33,8 +33,6 @@
 
     onMount(async () => {
         round = (await api.fetchRoundDetails(roundId)) ?? undefined;
-        console.log('ROUND');
-        console.log(round);
         if (round) {
             let roundStats = await api.fetchRoundHoleStats(roundId);
             let roundStrokes = await api.fetchRoundStrokes(roundId);
@@ -52,15 +50,16 @@
                     holeScores = [
                         ...holeScores,
                         {
-                            stats: roundStats.filter((s) => s.holeNumber === i + 1)[0],
+                            stats: roundStats.filter((s) => s.holeNumber === i + 1)[0] ?? {
+                                greenInRegulation: false,
+                                greenLightDrive: false,
+                            },
                             fullShots: roundStrokes.filter((s) => s.holeNumber === i + 1),
                             putts: roundStats.filter((s) => s.holeNumber === i + 1),
                         },
                     ];
                 }
             }
-            console.log('Hole scores compiled.');
-            console.log(holeScores);
         }
     });
 

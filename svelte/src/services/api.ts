@@ -207,9 +207,8 @@ export async function fetchInProgressRounds() {
 export async function saveNewRound(
     roundData: RoundData,
     courseId: number,
-    teeId: number,
 ): Promise<number> {
-    const endpoint = `/round/new/?course_id=${courseId}&tee_id=${teeId}`;
+    const endpoint = `/round/new/?course_id=${courseId}&tee_id=${roundData.playedTeeId}`;
     let requestBody: string = JSON.stringify({
         nickname: roundData.nickname,
         date_played: roundData.datePlayed?.toISOString().split('T')[0],
@@ -446,6 +445,7 @@ export async function fetchRoundDetails(roundId: number): Promise<RoundData | nu
             playedTeeId: rawData['fields']['played_tee'],
             roundCountsTowardHci: rawData['fields']['round_counts_toward_hci'],
             courseId: rawData['fields']['course'],
+            notes: rawData['fields']['notes'],
             id: rawData['pk']
         } as RoundData;
         return roundData;

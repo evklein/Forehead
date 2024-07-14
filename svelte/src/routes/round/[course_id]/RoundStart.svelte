@@ -3,14 +3,13 @@
     import type { TeeData } from '../../../models/TeeData';
     import * as api from '../../../services/api';
     import type { CourseData } from '../../../models/CourseData';
+    import { onMount } from 'svelte';
 
     export let continuing: boolean = false;
     export let course: CourseData;
     export let round: RoundData;
     export let tees: TeeData[];
     export let handleAdvance: Function;
-
-    let selectedTee: TeeData;
 
     async function advance() {
         console.log('ADVANCING!!!');
@@ -20,7 +19,7 @@
             await api.updateRound(round);
         } else {
             console.log(round.id);
-            round.id = await api.saveNewRound(round, course.courseId, selectedTee.id);
+            round.id = await api.saveNewRound(round, course.courseId);
         }
         handleAdvance();
     }
@@ -88,10 +87,10 @@
                 <div class="col-12 col-md-3 mb-3">
                     <div class="input-group">
                         <span class="input-group-text" id="tee-addon"><i class="fa-solid fa-golf-ball-tee"></i></span>
-                        <select class="form-select" aria-label="Tee select" bind:value={selectedTee}>
+                        <select class="form-select" aria-label="Tee select" bind:value={round.playedTeeId}>
                             <option selected>Tee</option>
                             {#each tees as tee}
-                                <option value={tee}>
+                                <option value={tee.id}>
                                     {tee.name}
                                 </option>
                             {/each}
