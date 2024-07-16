@@ -18,6 +18,8 @@
     export let handleGoToPreviousHole: Function;
     export let handleAdvance: Function;
     export let handleSetTargetCoordinate: Function;
+    export let selectedShotCoordinateIndex: number;
+    export let selectedShotCoordinateStart: boolean;
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
     let selectedTeeId: number | undefined = round.playedTeeId;
@@ -38,7 +40,7 @@
         }
     }
 
-    function removeStroke(strokeIndex: number) {
+    async function removeStroke(strokeIndex: number) {
         holeScore.fullShots.splice(strokeIndex, 1);
         holeScore.fullShots = holeScore.fullShots; // Trigger re-render
     }
@@ -52,10 +54,38 @@
         ];
     }
 
-    function removePutt(puttNumber: number) {
-        let puttIndex = puttNumber - 1;
+    function removePutt(puttIndex: number) {
         holeScore.putts.splice(puttIndex, 1);
         holeScore.putts = holeScore.putts;
+    }
+
+    function configureFullShotsForPenalty(targetedStrokeIndex: number) {
+        let targetedStroke = holeScore.fullShots[targetedStrokeIndex];
+        let prevStroke = holeScore.fullShots[targetedStrokeIndex - 1];
+        let nextStroke = holeScore.fullShots[targetedStrokeIndex + 1];
+
+        if (!targetedStroke.penalty) {
+            targetedStroke.startCoordinate = undefined;
+            targetedStroke.endCoordinate = undefined;
+
+            if (nextStroke) {
+                nextStroke.startCoordinate = undefined;
+            }
+        } else {
+            if (prevStroke) {
+                targetedStroke.startCoordinate = prevStroke.endCoordinate;
+            }
+
+            if (nextStroke) {
+                targetedStroke.endCoordinate = nextStroke.startCoordinate;
+            }
+        }
+    }
+
+    function setTargetCoordinate(strokeNumber: number, start: boolean) {
+        selectedShotCoordinateIndex = strokeNumber;
+        selectedShotCoordinateStart = start;
+        handleSetTargetCoordinate(strokeNumber, start);
     }
 
     $: coordinateButtonClass = (strokeIndex: number) => {
@@ -65,6 +95,11 @@
             return 'btn-danger';
         }
         return 'btn-primary';
+    };
+    $: coordinateButtonSelectedClass = (strokeIndex: number, start: boolean) => {
+        if (strokeIndex === selectedShotCoordinateIndex && start === selectedShotCoordinateStart)
+            return 'selected-coordinate';
+        return '';
     };
     $: formattedStartCoordinate = (strokeIndex: number) => {
         let shot = holeScore.fullShots[strokeIndex];
@@ -123,11 +158,12 @@
 
     async function saveAll() {
         if (round.id && hole.id) {
+            await api.purgeHoleShots(round.id, hole.id);
             await api.saveHoleStats(round.id, hole.id, holeScore.stats);
         }
 
-        let nextSelectedPointIndex = 0;
-        holeScore.fullShots.forEach(async (stroke, index) => {
+        for (let index = 0; index < holeScore.fullShots.length; index++) {
+            let stroke = holeScore.fullShots[index];
             if (round.id && hole.id) {
                 stroke.distance = geo.getDistanceFromLatLonInYards(
                     stroke.startCoordinate?.[0] ?? 0,
@@ -138,15 +174,15 @@
                 stroke.strokeNumber = index + 1;
                 await api.saveStroke(round.id, hole.id, stroke);
             }
-            nextSelectedPointIndex++;
-        });
+        }
 
-        holeScore.putts.forEach(async (putt, index) => {
+        for (let index = 0; index < holeScore.putts.length; index++) {
+            let putt = holeScore.putts[index];
             if (round.id && hole.id) {
                 putt.strokeNumber = holeScore.fullShots.length + index + 1;
                 await api.savePutt(round.id, hole.id, putt);
             }
-        });
+        }
     }
 
     async function saveAndGoToNext() {
@@ -292,7 +328,10 @@
                             {#each { length: holeScore.fullShots.length } as _, strokeIndex}
                                 <tr>
                                     <td>{strokeIndex + 1}</td>
-                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
+                                    <td
+                                        class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}
+                                        style="width: 200px;"
+                                    >
                                         <select
                                             class="form-select"
                                             id="floatingSelect"
@@ -308,10 +347,10 @@
                                         </select>
                                     </td>
                                     <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
-                                        {getFormattedDistanceForFullShot(strokeIndex)}
+                                        <span>{getFormattedDistanceForFullShot(strokeIndex)}</span>
                                     </td>
                                     <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
-                                        {getFormattedDistanceToGreen(strokeIndex)}
+                                        <span>{getFormattedDistanceToGreen(strokeIndex)}</span>
                                     </td>
                                     <td
                                         class="shot-coords {holeScore.fullShots[strokeIndex].penalty
@@ -319,8 +358,10 @@
                                             : null}"
                                     >
                                         <button
-                                            class="btn btn-small {coordinateButtonClass(strokeIndex)} coordinate"
-                                            on:click={() => handleSetTargetCoordinate(strokeIndex, true)}
+                                            class="btn btn-small {coordinateButtonClass(
+                                                strokeIndex,
+                                            )} {coordinateButtonSelectedClass(strokeIndex, true)} coordinate"
+                                            on:click={() => setTargetCoordinate(strokeIndex, true)}
                                         >
                                             {formattedStartCoordinate(strokeIndex)}
                                         </button>
@@ -331,8 +372,11 @@
                                             : null}"
                                     >
                                         <button
-                                            class="btn btn-small btn-primary coordinate"
-                                            on:click={() => handleSetTargetCoordinate(strokeIndex, false)}
+                                            class="btn btn-small btn-primary {coordinateButtonSelectedClass(
+                                                strokeIndex,
+                                                false,
+                                            )} coordinate"
+                                            on:click={() => setTargetCoordinate(strokeIndex, false)}
                                         >
                                             {formattedEndCoordinate(strokeIndex)}
                                         </button>
@@ -341,6 +385,7 @@
                                         <input
                                             class="penalty-checkbox form-check-input"
                                             type="checkbox"
+                                            on:change={() => configureFullShotsForPenalty(strokeIndex)}
                                             bind:checked={holeScore.fullShots[strokeIndex].penalty}
                                         />
                                     </td>
@@ -415,6 +460,10 @@
     td {
         text-align: center;
         vertical-align: middle;
+    }
+    .card {
+        max-height: 85vh;
+        overflow-y: scroll;
     }
     .tee-color {
         display: block;
@@ -503,5 +552,9 @@
         .tee-color {
             margin-left: 0px;
         }
+    }
+
+    .selected-coordinate {
+        border: 3px dotted red;
     }
 </style>

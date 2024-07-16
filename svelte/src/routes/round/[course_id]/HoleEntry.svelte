@@ -9,6 +9,7 @@
     import type { CourseData } from '../../../models/CourseData';
     import type { RoundData } from '../../../models/RoundData';
     import type { TeeData } from '../../../models/TeeData';
+    import type { MapMarker } from '../../../models/MapMarker';
 
     export let round: RoundData;
     export let course: CourseData;
@@ -17,15 +18,38 @@
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
 
-    let selectedStrokeCoordinateIndex: number = -1;
-    let selectedStrokeCoordinateStart: boolean = true;
+    let selectedShotCoordinateIndex: number = -1;
+    let selectedShotCoordinateStart: boolean = true;
     let currentHoleIndex: number = 0;
     let currentHole: HoleData;
     let currentHoleScore: HoleScore;
 
-    $: selectedPointsForMap = currentHoleScore?.fullShots
-        .map((fullShot) => [fullShot.startCoordinate, fullShot.endCoordinate])
-        .flat() as [number, number][];
+    $: selectedPointsForMap = (() => {
+        let mapMarkers: MapMarker[] = [];
+        if (currentHoleScore && currentHoleScore.fullShots) {
+            for (let i = 0; i < currentHoleScore.fullShots.length; i++) {
+                let startCoordinate = currentHoleScore.fullShots[i].startCoordinate;
+                let endCoordinate = currentHoleScore.fullShots[i].endCoordinate;
+
+                if (startCoordinate) {
+                    let startMarkerForShot = {
+                        coordinates: startCoordinate,
+                        drop: i > 0 ? currentHoleScore.fullShots[i - 1].penalty : false,
+                    };
+                    mapMarkers = [...mapMarkers, startMarkerForShot];
+                }
+
+                if (endCoordinate) {
+                    let endMarkerForShot = {
+                        coordinates: endCoordinate,
+                        drop: false,
+                    };
+                    mapMarkers = [...mapMarkers, endMarkerForShot];
+                }
+            }
+        }
+        return mapMarkers;
+    })();
 
     onMount(() => {
         currentHole = holes[currentHoleIndex];
@@ -45,29 +69,27 @@
     }
 
     function selectPointOnMap(coordinates: [number, number]) {
-        if (selectedStrokeCoordinateIndex !== -1) {
-            console.log(
-                'Setting coordinates for ' + selectedStrokeCoordinateIndex + '.' + selectedStrokeCoordinateStart,
-            );
-            if (selectedStrokeCoordinateStart) {
-                currentHoleScore.fullShots[selectedStrokeCoordinateIndex].startCoordinate = coordinates;
+        if (selectedShotCoordinateIndex !== -1) {
+            console.log('Setting coordinates for ' + selectedShotCoordinateIndex + '.' + selectedShotCoordinateStart);
+            if (selectedShotCoordinateStart) {
+                currentHoleScore.fullShots[selectedShotCoordinateIndex].startCoordinate = coordinates;
 
-                let previousShot = currentHoleScore.fullShots[selectedStrokeCoordinateIndex - 1];
+                let previousShot = currentHoleScore.fullShots[selectedShotCoordinateIndex - 1];
                 if (previousShot && !previousShot.penalty) {
                     previousShot.endCoordinate = coordinates;
                 }
             } else {
-                currentHoleScore.fullShots[selectedStrokeCoordinateIndex].endCoordinate = coordinates;
+                currentHoleScore.fullShots[selectedShotCoordinateIndex].endCoordinate = coordinates;
 
-                let nextShot = currentHoleScore.fullShots[selectedStrokeCoordinateIndex + 1];
+                let nextShot = currentHoleScore.fullShots[selectedShotCoordinateIndex + 1];
                 if (nextShot && !nextShot.penalty) {
                     nextShot.startCoordinate = coordinates;
                 }
             }
         }
 
-        selectedStrokeCoordinateIndex = -1;
-        selectedStrokeCoordinateStart = true;
+        selectedShotCoordinateIndex = -1;
+        selectedShotCoordinateStart = true;
     }
 
     function getCurrentInstructions(): string {
@@ -94,13 +116,27 @@
     }
 
     function setTargetCoordinate(strokeIndex: number, start: boolean) {
-        selectedStrokeCoordinateIndex = strokeIndex;
-        selectedStrokeCoordinateStart = start;
+        selectedShotCoordinateIndex = strokeIndex;
+        selectedShotCoordinateStart = start;
     }
 </script>
 
 <div class="row align-items-start">
-    <div class="col-12">
+    <div class="col-5">
+        {#if currentHole}
+            {#key currentHoleIndex}
+                <Map
+                    focusBounds={currentHole.boundPoints}
+                    markers={selectedPointsForMap}
+                    highlightSelectedbounds={true}
+                    handleSelectPointOnMap={selectPointOnMap}
+                    markerChoice={MapMarkerChoice.ShotTracer}
+                    showAdditionalControls={true}
+                />
+            {/key}
+        {/if}
+    </div>
+    <div class="col-6">
         <HoleScoreCard
             {round}
             {course}
@@ -111,6 +147,8 @@
             {handleAdvance}
             handleSetTargetCoordinate={setTargetCoordinate}
             {courseTees}
+            {selectedShotCoordinateIndex}
+            {selectedShotCoordinateStart}
         />
         {#if currentHole}
             <!-- <InputDirector>
@@ -118,20 +156,6 @@
                     {@html getCurrentInstructions()}
                 {/key}
             </InputDirector> -->
-        {/if}
-    </div>
-    <div class="col-12">
-        {#if currentHole}
-            {#key currentHoleIndex}
-                <Map
-                    focusBounds={currentHole.boundPoints}
-                    specialPoints={selectedPointsForMap}
-                    highlightSelectedbounds={true}
-                    handleSelectPointOnMap={selectPointOnMap}
-                    markerChoice={MapMarkerChoice.ShotTracer}
-                    showAdditionalControls={true}
-                />
-            {/key}
         {/if}
     </div>
 </div>

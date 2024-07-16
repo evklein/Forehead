@@ -319,6 +319,19 @@ export async function savePutt(
     }
 }
 
+export async function purgeHoleShots(
+    roundId: number,
+    holeId: number,
+) {
+    const endpoint = `/round/${roundId}/hole/${holeId}/purge-shots/`
+    try {
+        await apiHelpers.post(FOREHEAD_API_URL, endpoint, '');
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+    }
+}
+
 export async function getHoleStatsForRound(roundId: number) {
     const endpoint = `/round/${roundId}/stats/`;
     try {

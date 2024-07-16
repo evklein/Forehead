@@ -108,20 +108,14 @@ def saveHoleStats(request, round_id, hole_id):
             rnd = Round.objects.get(pk=round_id)
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
-            stats = HoleStats(rnd=rnd, hole=hole)
             
-            existing_stats = HoleStats.objects.filter(rnd=rnd, hole=hole)
-            if existing_stats is not None:
-                stats = existing_stats[0]
+            stats, created = HoleStats.objects.update_or_create(
+                rnd=rnd, 
+                hole=hole, 
+                defaults=data
+            )
+            return JsonResponse({'message': 'Data saved successfully', 'created': created})
 
-            for key, value in data.items():
-                sanitized_val = value
-                if value == 'true':
-                    sanitized_val = True
-                elif value == 'false':
-                    sanitized_val = False
-                setattr(stats, key, sanitized_val)
-            
             stats.save()
 
             return JsonResponse({'message': 'Data saved successfully'})
@@ -137,31 +131,18 @@ def saveStroke(request, round_id, hole_id):
             rnd = Round.objects.get(pk=round_id)
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
-            stroke = Stroke(rnd=rnd, hole=hole)
 
-            existing_strokes = Stroke.objects.filter(rnd=rnd, hole=hole, stroke_number=data['stroke_number'])
-            if existing_strokes is not None:
-                stroke = existing_strokes[0]
-
-            for key, value in data.items():
-                setattr(stroke, key, value)
-            
-            print(stroke)
-            stroke.save()
-            print("Stroke saved")
-
-            return JsonResponse({'message': 'Data saved successfully'})
+            stroke, created = Stroke.objects.update_or_create(
+                rnd=rnd, 
+                hole=hole, 
+                stroke_number=data['stroke_number'],
+                defaults=data
+            )
+            return JsonResponse({'message': 'Data saved successfully', 'created': created})
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-import time
-from .models import Round, Hole, Putt
-from django.db import OperationalError
 
 @csrf_exempt
 def savePutt(request, round_id, hole_id):
@@ -171,22 +152,36 @@ def savePutt(request, round_id, hole_id):
             hole = Hole.objects.get(pk=hole_id)
             data = json.loads(request.body)
 
-            retry_attempts = 5
-            for attempt in range(retry_attempts):
-                try:
-                    putt, created = Putt.objects.update_or_create(
-                        rnd=rnd, 
-                        hole=hole, 
-                        stroke_number=data['stroke_number'],
-                        defaults=data
-                    )
-                    return JsonResponse({'message': 'Data saved successfully', 'created': created})
-                except OperationalError as e:
-                    if 'database is locked' in str(e) and attempt < retry_attempts - 1:
-                        time.sleep(2)  # wait for 2 seconds before retrying
-                    else:
-                        raise
+            putt, created = Putt.objects.update_or_create(
+                rnd=rnd, 
+                hole=hole, 
+                stroke_number=data['stroke_number'],
+                defaults=data
+            )
+            return JsonResponse({'message': 'Data saved successfully', 'created': created})
 
+        except Round.DoesNotExist:
+            return JsonResponse({'error': 'Round not found'}, status=404)
+        except Hole.DoesNotExist:
+            return JsonResponse({'error': 'Hole not found'}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+
+
+@csrf_exempt
+def purgeShots(request, round_id, hole_id):
+    if request.method == 'POST':
+        try:
+            rnd = Round.objects.get(pk=round_id)
+            hole = Hole.objects.get(pk=hole_id)
+            putts = Putt.objects.filter(rnd=rnd, hole=hole)
+            strokes = Stroke.objects.filter(rnd=rnd, hole=hole)
+
+            putts.delete()
+            strokes.delete()
+            return JsonResponse({'message': 'Strokes and putts removed successfully'})
         except Round.DoesNotExist:
             return JsonResponse({'error': 'Round not found'}, status=404)
         except Hole.DoesNotExist:

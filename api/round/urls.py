@@ -17,4 +17,5 @@ urlpatterns = [
     path("<int:round_id>/hole/<int:hole_id>/new/", views.saveHoleStats, name="saveHoleStats"),
     path("<int:round_id>/hole/<int:hole_id>/strokes/new/", views.saveStroke, name="saveStroke"),
     path("<int:round_id>/hole/<int:hole_id>/putts/new/", views.savePutt, name="savePutt"),
+    path("<int:round_id>/hole/<int:hole_id>/purge-shots/", views.purgeShots, name="purgeShots"),
 ]

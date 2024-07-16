@@ -1,10 +1,11 @@
 <script lang="ts">
     import { afterUpdate, onMount } from 'svelte';
     import { MapMarkerChoice } from './MapMarkerChoice';
+    import type { MapMarker } from '../../models/MapMarker';
 
     export let focusBounds: [number, number][];
     export let highlightSelectedbounds: boolean;
-    export let specialPoints: [number, number][] = [];
+    export let markers: MapMarker[] = [];
     export let handleSelectPointOnMap: Function | undefined = undefined;
     export let markerChoice: MapMarkerChoice = MapMarkerChoice.Default;
     export let showAdditionalControls: boolean = false;
@@ -14,11 +15,11 @@
 
     onMount(async () => {
         await buildMap();
-        await placeMarkers(specialPoints);
+        await placeMarkers(markers);
     });
 
     afterUpdate(async () => {
-        await placeMarkers(specialPoints);
+        await placeMarkers(markers);
     });
 
     async function buildMap() {
@@ -48,23 +49,12 @@
                     handleSelectPointOnMap([wrappedCoordinates.lat, wrappedCoordinates.lng]);
                 }
             });
-
-            if (specialPoints && Array.isArray(specialPoints)) {
-                specialPoints.forEach((point) => {
-                    if (Array.isArray(point) && point.length === 2) {
-                        let [latitude, longitude] = point;
-                        L.marker([latitude, longitude]).addTo(map);
-                    } else {
-                        console.warn('Invalid point format', point);
-                    }
-                });
-            }
         }
 
         return L;
     }
 
-    async function placeMarkers(markerCoordinates: [number, number][]) {
+    async function placeMarkers(markers: MapMarker[]) {
         const L = await import('leaflet');
         await import('leaflet/dist/leaflet.css');
 
@@ -73,25 +63,32 @@
         }
         markerLayerGroup.clearLayers();
 
-        for (let i = 0; i < markerCoordinates.length; i++) {
-            let marker;
+        for (let i = 0; i < markers.length; i++) {
+            let marker = markers[i];
+            let leafletMarker;
             switch (markerChoice) {
                 case MapMarkerChoice.Default:
-                    marker = L.marker(markerCoordinates[i] as [number, number]).addTo(markerLayerGroup);
-                    marker.bindPopup(`[${markerCoordinates[0]}, ${markerCoordinates[1]}]`);
+                    leafletMarker = L.marker(marker.coordinates).addTo(markerLayerGroup);
+                    leafletMarker.bindPopup(`[${marker.coordinates[0]}, ${marker.coordinates[1]}]`);
                     break;
                 case MapMarkerChoice.ShotTracer:
-                    marker = L.circleMarker(markerCoordinates[i] as [number, number], {
-                        fillColor: i > 0 ? 'white' : 'yellow',
-                        color: i > 0 ? 'white' : 'yellowf',
+                    let markerColor = 'white';
+                    if (i === 0) markerColor = 'yellow';
+                    if (marker.drop) markerColor = 'red';
+
+                    leafletMarker = L.circleMarker(marker.coordinates, {
+                        fillColor: markerColor,
+                        color: markerColor,
                         radius: 8,
                     }).addTo(markerLayerGroup);
 
-                    if (markerCoordinates.length > 1 && i >= 1) {
-                        let lastMarkerPosition = markerCoordinates[i - 1];
-                        L.polyline([markerCoordinates[i] as [number, number], lastMarkerPosition], {
-                            color: 'white',
-                        }).addTo(markerLayerGroup);
+                    if (markers.length > 1 && i >= 1) {
+                        let lastMarker = markers[i - 1];
+                        if (!marker.drop) {
+                            L.polyline([marker.coordinates, lastMarker.coordinates], {
+                                color: 'white',
+                            }).addTo(markerLayerGroup);
+                        }
                     }
                     break;
             }
@@ -100,8 +97,8 @@
 
     function clickUseCurrentLocation() {
         navigator.geolocation.getCurrentPosition((position) => {
-            let lat = position.coords.latitude + Math.random() * 0.001;
-            let long = position.coords.longitude + Math.random() * 0.001;
+            let lat = position.coords.latitude;
+            let long = position.coords.longitude;
             if (handleSelectPointOnMap) {
                 handleSelectPointOnMap([lat, long]);
             }

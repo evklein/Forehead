@@ -24,7 +24,7 @@
         flex-direction: column;
         padding: 1rem;
         width: 100%;
-        max-width: 70rem;
+        max-width: 95rem;
         margin: 0 auto;
         box-sizing: border-box;
     }
