@@ -62,7 +62,7 @@
     }
 
     async function saveScrambleRound() {
-        await api.savePracticeGame(scrambleGameData);
+        await api.saveScrambleGame(scrambleGameData);
         await getRecentRounds();
     }
 </script>

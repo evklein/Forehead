@@ -17,4 +17,11 @@
         link="/practice/scramble"
         badgeText="Game"
     />
+    <PracticeModeCard
+        mode="Swing Calibration"
+        description="Test swing for weaknesses."
+        imagePath="https://media.istockphoto.com/id/1289137258/photo/asian-chinese-mature-man-golf-couch-teaching-young-male-student-to-play-golf-at-driving-range.jpg?s=612x612&w=0&k=20&c=upfK8gdl0rzw_a-xLlGDM2TwgVR5Ke3LbmniwDJFunQ="
+        link="/practice/calibration"
+        badgeText="Drill"
+    />
 </div>

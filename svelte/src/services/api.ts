@@ -421,11 +421,30 @@ export async function savePracticeStroke(practiceStroke: PracticeStrokeData) {
     }
 }
 
-export async function savePracticeGame(practiceGame: ScrambleGameData) {
+export async function saveScrambleGame(practiceGame: ScrambleGameData) {
     const endpoint = `/practice/game/`;
     let requestBody: string = JSON.stringify({
         game_type: 'scramble',
         game_data: JSON.stringify(practiceGame),
+    });
+    try {
+        let response = await apiHelpers.post(
+            FOREHEAD_API_URL,
+            endpoint,
+            requestBody,
+        );
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return -1;
+    }
+}
+
+export async function saveDrillResults(stringifiedDrillData: string, drillType: string) {
+    const endpoint = `/practice/game/`;
+    let requestBody: string = JSON.stringify({
+        game_type: 'swing_calibration',
+        game_data: stringifiedDrillData
     });
     try {
         let response = await apiHelpers.post(
