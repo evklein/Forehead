@@ -17,7 +17,7 @@ def fetchRound(request, round_id):
     return HttpResponse(trimmed_data, content_type='application/json')
 
 def fetchRoundsInProgress(request):
-    rounds = Round.objects.filter(in_progress=True)
+    rounds = Round.objects.filter(in_progress=True).order_by('-date_played')
     raw_data = serializers.serialize('json', rounds)
     return HttpResponse(raw_data, content_type='application/json')
 

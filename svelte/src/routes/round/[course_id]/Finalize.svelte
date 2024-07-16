@@ -4,6 +4,7 @@
     import type { HoleStatsData } from '../../../models/HoleStatsData';
     import type { RoundData } from '../../../models/RoundData';
     import type { StrokeData } from '../../../models/StrokeData';
+    import * as scoreCardUtils from '../../../services/scoreCardUtilities';
 
     export let course: CourseData;
     export let round: RoundData;
@@ -12,27 +13,17 @@
     export let strokes: StrokeData[];
     export let putts: StrokeData[];
 
-    function getCumulativeStrokeForHole(holeNumber: number): number {
-        return strokes.filter((s) => s.holeNumber === holeNumber).length + getCumultativePuttsForHole(holeNumber);
-    }
+    $: getCumulativeStrokeForHole = (holeNumber: number) => {
+        console.log(strokes);
+        return strokes?.filter((s) => s.holeNumber === holeNumber).length + getCumultativePuttsForHole(holeNumber);
+    };
 
     function getCumultativePuttsForHole(holeNumber: number): number {
-        return putts.filter((p) => p.holeNumber === holeNumber).length;
+        return putts?.filter((p) => p.holeNumber === holeNumber).length;
     }
 
     function getStatsForHole(holeNumber: number): HoleStatsData | undefined {
-        return stats.find((s) => s.holeNumber === holeNumber);
-    }
-
-    function getBorderForHoleScore(hole: HoleData): string {
-        let score = getCumulativeStrokeForHole(hole.holeNumber);
-        let par = hole.par;
-
-        if (score <= par - 2) return 'border: 3px double white; border-radius: 20px;';
-        if (score === par - 1) return 'border: 2px solid white; border-radius: 20px;';
-        if (score === par) return '';
-        if (score === par + 1) return 'border: 1px solid white';
-        return 'border: 3px double white';
+        return stats?.find((s) => s.holeNumber === holeNumber);
     }
 
     function getFinalScore() {
@@ -90,7 +81,13 @@
                                 <td>Score</td>
                                 {#each holes as hole}
                                     <td>
-                                        <span class="score-number" style={getBorderForHoleScore(hole)}>
+                                        <span
+                                            class="score-number"
+                                            style={scoreCardUtils.getScoreElementBorder(
+                                                getCumulativeStrokeForHole(hole.holeNumber),
+                                                hole.par,
+                                            )}
+                                        >
                                             {getCumulativeStrokeForHole(hole.holeNumber)}
                                         </span>
                                     </td>

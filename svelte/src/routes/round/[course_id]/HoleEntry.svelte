@@ -54,18 +54,26 @@
     onMount(() => {
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
+        resetSelectedShotIndex();
     });
 
     function incrementCurrentHoleNumber() {
         currentHoleIndex++;
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
+        resetSelectedShotIndex();
     }
 
     function decrementCurrentHoleNumber() {
         currentHoleIndex--;
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
+        resetSelectedShotIndex();
+    }
+
+    function resetSelectedShotIndex() {
+        selectedShotCoordinateIndex = 0;
+        selectedShotCoordinateStart = true;
     }
 
     function selectPointOnMap(coordinates: [number, number]) {
@@ -88,8 +96,11 @@
             }
         }
 
-        selectedShotCoordinateIndex = -1;
-        selectedShotCoordinateStart = true;
+        if (selectedShotCoordinateIndex === 0 && selectedShotCoordinateStart) {
+            if (selectedShotCoordinateStart) selectedShotCoordinateStart = false;
+        } else {
+            selectedShotCoordinateIndex++;
+        }
     }
 
     function getCurrentInstructions(): string {
@@ -122,7 +133,7 @@
 </script>
 
 <div class="row align-items-start">
-    <div class="col-5">
+    <div class="map-col col-12 col-md-5">
         {#if currentHole}
             {#key currentHoleIndex}
                 <Map
@@ -136,7 +147,7 @@
             {/key}
         {/if}
     </div>
-    <div class="col-6">
+    <div class="card-col col-12 col-md-7">
         <HoleScoreCard
             {round}
             {course}
@@ -159,3 +170,15 @@
         {/if}
     </div>
 </div>
+
+<style>
+    @media only screen and (max-width: 799px) {
+        .map-col {
+            order: 1;
+        }
+
+        .card-col {
+            order: 0;
+        }
+    }
+</style>

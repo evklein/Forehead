@@ -281,11 +281,15 @@
                                 </span>
                             </td>
                             <td>
-                                <input
-                                    class="score-checkbox form-check-input"
-                                    type="checkbox"
-                                    bind:checked={holeScore.stats.greenLightDrive}
-                                />
+                                {#if hole?.par === 3}
+                                    <span class="disabled-checkbox-placeholder">-</span>
+                                {:else}
+                                    <input
+                                        class="score-checkbox form-check-input"
+                                        type="checkbox"
+                                        bind:checked={holeScore.stats.greenLightDrive}
+                                    />
+                                {/if}
                             </td>
                             <td>
                                 <input

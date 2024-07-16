@@ -62,6 +62,9 @@
                 }
             }
         }
+
+        console.log('all loading has occurred.');
+        console.log(holeScores);
     });
 
     async function advanceToFinalizePage() {
@@ -83,6 +86,7 @@
             bind:round
             {tees}
             handleAdvance={() => (entryStage = RoundStage.HoleEntry)}
+            handleAdvanceToFinal={advanceToFinalizePage}
         />
     {:else if entryStage === RoundStage.HoleEntry}
         <HoleEntry {round} {course} {holes} {holeScores} handleAdvance={advanceToFinalizePage} courseTees={tees} />
