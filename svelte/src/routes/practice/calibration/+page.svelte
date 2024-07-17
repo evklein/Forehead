@@ -1,17 +1,32 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import * as api from '../../../services/api';
+    import type { CalibrationResultsData } from '../../../models/CalibrationResultsData';
 
     let numberOfShots: number = 20;
 
     let groundStrikeOptions = ['Good', 'Thin', 'Fat'];
     let faceStrikeOptions = ['Sweet spot', 'Heel', 'Toe'];
     let directionOptions = ['Within Target Area', 'Left', 'Right'];
-    let groundStrikeValues = Array(numberOfShots).fill('');
-    let faceStrikeValues = Array(numberOfShots).fill('');
-    let directionValues = Array(numberOfShots).fill('');
+    let groundStrikeValues: string[] = [];
+    let faceStrikeValues: string[] = [];
+    let directionValues: string[] = [];
+    let recentCalibrationResults: CalibrationResultsData[] = [];
 
-    onMount(async () => {});
+    function resetValues() {
+        groundStrikeValues = Array(numberOfShots).fill('');
+        faceStrikeValues = Array(numberOfShots).fill('');
+        directionValues = Array(numberOfShots).fill('');
+    }
+
+    onMount(async () => {
+        resetValues();
+        getRecentCalibrationResults();
+    });
+
+    async function getRecentCalibrationResults() {
+        recentCalibrationResults = (await api.getRecentCalibrationResults()) ?? [];
+    }
 
     async function saveCalibrationResults() {
         let drillData = JSON.stringify({
@@ -20,12 +35,8 @@
             directionValues: directionValues,
         });
         await api.saveDrillResults(drillData, 'swing_calibration');
-    }
-
-    function resetValues() {
-        groundStrikeValues = Array(numberOfShots).fill('');
-        faceStrikeValues = Array(numberOfShots).fill('');
-        directionValues = Array(numberOfShots).fill('');
+        resetValues();
+        await getRecentCalibrationResults();
     }
 </script>
 
@@ -104,6 +115,31 @@
                     </button>
                     <button type="button" class="btn btn-lg btn-secondary" on:click={resetValues}> Restart </button>
                 </div>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h4 class="card-title">Previous Tests</h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Ground Strikes</th>
+                            <th>Face Strikes</th>
+                            <th>Direction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each recentCalibrationResults as recentCalibrationResult}
+                            <tr>
+                                <td>{recentCalibrationResult.date.toLocaleDateString()}</td>
+                                <td>{recentCalibrationResult.groundStrikeSuccesses}/20</td>
+                                <td>{recentCalibrationResult.faceStrikeSuccesses}/20</td>
+                                <td>{recentCalibrationResult.directionSuccesses}/20</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

@@ -9,6 +9,7 @@ import type { RoundData } from '../models/RoundData';
 import type { PracticeStrokeData } from '../models/PracticeStrokeData';
 import type { ScrambleGameData } from '../models/ScrambleGameData';
 import type { ScrambleRoundData } from '../models/ScrambleRoundData';
+import type { CalibrationResultsData } from '../models/CalibrationResultsData';
 
 const FOREHEAD_API_URL =
     import.meta.env.VITE_BONK_API_URL ?? 'http://localhost:8000';
@@ -570,6 +571,28 @@ export async function getRecentUpDownRounds(): Promise<ScrambleRoundData[] | nul
             });
         }
         return roundData;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getRecentCalibrationResults(): Promise<CalibrationResultsData[] | null> {
+    const endpoint = `/practice/calibrations/recent/`;
+    try {
+        const rawData = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
+        let results: CalibrationResultsData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextTest = rawData[i];
+            results.push({
+                date: new Date(nextTest['date']),
+                groundStrikeSuccesses: nextTest['ground_strike_successes'],
+                faceStrikeSuccesses: nextTest['face_strike_successes'],
+                directionSuccesses: nextTest['direction_successes']
+            });
+        }
+        return results;
     } catch (error) {
         console.error(`${endpoint}: request failed.`);
         console.error(error);

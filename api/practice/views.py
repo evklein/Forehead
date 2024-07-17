@@ -40,9 +40,8 @@ def savePracticeGame(request):
     else:
         return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
 
-
 def getRecentGameScores(request):
-    games = PracticeGame.objects.all().order_by('-date')[:10]
+    games = PracticeGame.objects.filter(game_type='scramble').order_by('-date')[:10]
     results = []
     for game in games:
         deserialized_game_data = json.loads(game.game_data)
@@ -54,6 +53,24 @@ def getRecentGameScores(request):
             'date': game.date,
             'totalShots': sum(game_chips) + sum(game_putts),
             'totalYards': sum(game_yardages)
+        })
+
+    return JsonResponse(results, safe=False)
+
+def getRecentCalibrations(request):
+    drills = PracticeGame.objects.filter(game_type='swing_calibration').order_by('-date')[:10]
+    results = []
+    for drill in drills:
+        deserialized_drill_data = json.loads(drill.game_data)
+        ground_strike_successes = deserialized_drill_data['groundStrikeValues'].count('Good')
+        face_strike_successes = deserialized_drill_data['faceStrikeValues'].count('Sweet spot')
+        direction_successes = deserialized_drill_data['directionValues'].count('Sweet spot')
+
+        results.append({
+            'date': drill.date,
+            'ground_strike_successes': ground_strike_successes,
+            'face_strike_successes': face_strike_successes,
+            'direction_successes': direction_successes
         })
 
     return JsonResponse(results, safe=False)
