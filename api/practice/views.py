@@ -64,7 +64,7 @@ def getRecentCalibrations(request):
         deserialized_drill_data = json.loads(drill.game_data)
         ground_strike_successes = deserialized_drill_data['groundStrikeValues'].count('Good')
         face_strike_successes = deserialized_drill_data['faceStrikeValues'].count('Sweet spot')
-        direction_successes = deserialized_drill_data['directionValues'].count('Sweet spot')
+        direction_successes = deserialized_drill_data['directionValues'].count('Within Target Area')
 
         results.append({
             'date': drill.date,
