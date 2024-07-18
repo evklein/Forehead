@@ -3,6 +3,10 @@
     import './styles.css';
 </script>
 
+<svelte:head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+</svelte:head>
+
 <div class="app">
     <Header />
 
