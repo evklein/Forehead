@@ -96,13 +96,24 @@
     }
 
     function clickUseCurrentLocation() {
-        navigator.geolocation.getCurrentPosition((position) => {
-            let lat = position.coords.latitude;
-            let long = position.coords.longitude;
-            if (handleSelectPointOnMap) {
-                handleSelectPointOnMap([lat, long]);
-            }
-        });
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                let lat = position.coords.latitude;
+                let long = position.coords.longitude;
+                if (handleSelectPointOnMap) {
+                    handleSelectPointOnMap([lat, long]);
+                }
+                console.log('Accuracy: ' + position.coords.accuracy);
+            },
+            (error) => {
+                console.error('Error obtaining location:', error);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            },
+        );
     }
 </script>
 
