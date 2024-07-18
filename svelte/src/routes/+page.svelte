@@ -2,8 +2,9 @@
 </script>
 
 <svelte:head>
-    <title>Home</title>
+    <title>Forehead</title>
     <meta name="description" content="Forehead" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 </svelte:head>
 
 <div>
