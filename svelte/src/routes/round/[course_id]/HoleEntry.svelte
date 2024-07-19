@@ -133,7 +133,7 @@
 </script>
 
 <div class="row align-items-start">
-    <div class="map-col col-12 col-md-5">
+    <!-- <div class="map-col col-12 col-md-5">
         {#if currentHole}
             {#key currentHoleIndex}
                 <Map
@@ -146,7 +146,7 @@
                 />
             {/key}
         {/if}
-    </div>
+    </div> -->
     <div class="card-col col-12 col-md-7">
         <HoleScoreCard
             {round}
@@ -160,7 +160,22 @@
             {courseTees}
             {selectedShotCoordinateIndex}
             {selectedShotCoordinateStart}
-        />
+        >
+            <div class="m-1">
+                {#if currentHole}
+                    {#key currentHoleIndex}
+                        <Map
+                            focusBounds={currentHole.boundPoints}
+                            markers={selectedPointsForMap}
+                            highlightSelectedbounds={true}
+                            handleSelectPointOnMap={selectPointOnMap}
+                            markerChoice={MapMarkerChoice.ShotTracer}
+                            showAdditionalControls={true}
+                        />
+                    {/key}
+                {/if}
+            </div>
+        </HoleScoreCard>
         {#if currentHole}
             <!-- <InputDirector>
                 {#key (currentHoleScore.numberOfStrokes, currentHoleScore.numberOfPutts, selectedPoints)}

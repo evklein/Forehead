@@ -6,10 +6,15 @@
     import * as api from '../../../../services/api';
     import type { HoleData } from '../../../../models/HoleData';
     import HoleFormCard from './HoleFormCard.svelte';
+    import { goto } from '$app/navigation';
 
     $: params = $page.params;
     $: courseId = Number(params.course_id);
-    $: holeNumber = Number(params.hole);
+    $: markers = hole.boundPoints.map((point) => {
+        return {
+            coordinates: point,
+        };
+    });
 
     let course: CourseData = {
         courseId: -1,
@@ -23,7 +28,7 @@
         boundPoints: [],
     };
     let hole: HoleData = {
-        holeNumber: holeNumber,
+        holeNumber: 1,
         par: 0,
         boundPoints: [],
     };
@@ -31,7 +36,7 @@
     let mapCanBeLoaded: boolean = false;
 
     onMount(async () => {
-        let holeDetails = await api.fetchHoleDetails(courseId, holeNumber);
+        let holeDetails = await api.fetchHoleDetails(courseId, 1);
         if (holeDetails) {
             hole = holeDetails;
             initialBoundPointCount = hole.boundPoints.length;
@@ -46,7 +51,24 @@
     });
 
     function selectPoints(coordinates: [number, number]) {
+        console.log('Setting point');
         hole.boundPoints = [...hole.boundPoints, coordinates];
+    }
+
+    async function goToNextHole() {
+        let holeDetails = await api.fetchHoleDetails(courseId, hole.holeNumber + 1);
+        if (holeDetails) {
+            hole = holeDetails;
+            initialBoundPointCount = hole.boundPoints.length;
+        }
+    }
+
+    async function goToPreviousHole() {
+        let holeDetails = await api.fetchHoleDetails(courseId, hole.holeNumber - 1);
+        if (holeDetails) {
+            hole = holeDetails;
+            initialBoundPointCount = hole.boundPoints.length;
+        }
     }
 </script>
 
@@ -56,29 +78,24 @@
             {#if initialBoundPointCount === 0}
                 <Map
                     bind:focusBounds={course.boundPoints}
-                    bind:selectedBounds={hole.boundPoints}
+                    {markers}
                     handleSelectPointOnMap={selectPoints}
                     highlightSelectedbounds={false}
                 />
             {:else}
-                <Map
-                    bind:focusBounds={hole.boundPoints}
-                    bind:selectedBounds={hole.boundPoints}
-                    highlightSelectedbounds={true}
-                    specialPoints={hole.centerGreenPoint
-                        ? [hole.centerGreenPoint]
-                        : []}
-                />
+                <Map bind:focusBounds={hole.boundPoints} {markers} highlightSelectedbounds={true} />
             {/if}
         {/if}
     </div>
     <div class="col-5">
         <HoleFormCard
             {courseId}
-            {holeNumber}
+            holeNumber={hole.holeNumber}
             courseName={course.name}
             bind:hole
             saveHole={async () => await api.saveHole(courseId, hole)}
+            handleGoToNextHole={goToNextHole}
+            handleGoToPreviousHole={goToPreviousHole}
         />
     </div>
 </div>

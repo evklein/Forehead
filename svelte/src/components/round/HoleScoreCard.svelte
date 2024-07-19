@@ -7,6 +7,7 @@
     import type { CourseData } from '../../models/CourseData';
     import type { RoundData } from '../../models/RoundData';
     import type { TeeData } from '../../models/TeeData';
+    import { onMount } from 'svelte';
 
     // Props
     export let course: CourseData;
@@ -35,8 +36,9 @@
             },
         ];
 
-        if (newStrokeNumber > 1) {
-            holeScore.fullShots[newStrokeNumber - 2].endCoordinate = startCoordinates;
+        if (newStrokeNumber >= 1) {
+            holeScore.fullShots[newStrokeNumber].startCoordinate =
+                holeScore.fullShots[newStrokeNumber - 1].endCoordinate;
         }
     }
 
@@ -52,6 +54,11 @@
                 distance: 0,
             },
         ];
+    }
+
+    function handleFocus(event: FocusEvent): void {
+        const target = event.target as HTMLInputElement;
+        target.select();
     }
 
     function removePutt(puttIndex: number) {
@@ -233,10 +240,6 @@
                 </div>
                 <!-- <span class="title-section par-badge badge text-bg-success">Par {hole?.par}</span> -->
             </h5>
-            <div class="btn btn-group">
-                <button class="btn btn-primary" on:click={() => addFullShot()}>Add FullShot</button>
-                <button class="btn btn-info" on:click={addPutt}>Add Putt</button>
-            </div>
             <div class="score-entry">
                 <table class="table table-bordered">
                     <thead>
@@ -313,17 +316,25 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+    <div class="card mt-2">
+        <div class="card-body">
+            <div class="card-title">
+                <h2>Enter Full Shots</h2>
+                <button class="btn btn-primary btn-right" on:click={() => addFullShot()}>Add Full Shot</button>
+            </div>
             <div class="shot-entry">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th style="width: 30px" scope="col">Stroke</th>
                             <th scope="col">Club</th>
-                            <th scope="col">Distance (Yards)</th>
-                            <th scope="col">To Center</th>
                             <th scope="col">Start</th>
                             <th scope="col">End</th>
                             <th scope="col">Penalty</th>
+                            <th scope="col">Distance (Yards)</th>
+                            <th scope="col">To Center</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -332,12 +343,9 @@
                             {#each { length: holeScore.fullShots.length } as _, strokeIndex}
                                 <tr>
                                     <td>{strokeIndex + 1}</td>
-                                    <td
-                                        class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}
-                                        style="width: 200px;"
-                                    >
+                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
                                         <select
-                                            class="form-select"
+                                            class="form-select club-select"
                                             id="floatingSelect"
                                             aria-label="club-select"
                                             bind:value={holeScore.fullShots[strokeIndex].club}
@@ -350,19 +358,13 @@
                                             {/each}
                                         </select>
                                     </td>
-                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
-                                        <span>{getFormattedDistanceForFullShot(strokeIndex)}</span>
-                                    </td>
-                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
-                                        <span>{getFormattedDistanceToGreen(strokeIndex)}</span>
-                                    </td>
                                     <td
                                         class="shot-coords {holeScore.fullShots[strokeIndex].penalty
                                             ? 'penalty-cell'
                                             : null}"
                                     >
                                         <button
-                                            class="btn btn-small {coordinateButtonClass(
+                                            class="btn btn-small coordinate-button {coordinateButtonClass(
                                                 strokeIndex,
                                             )} {coordinateButtonSelectedClass(strokeIndex, true)} coordinate"
                                             on:click={() => setTargetCoordinate(strokeIndex, true)}
@@ -376,7 +378,7 @@
                                             : null}"
                                     >
                                         <button
-                                            class="btn btn-small btn-primary {coordinateButtonSelectedClass(
+                                            class="btn btn-small coordinate-button btn-primary {coordinateButtonSelectedClass(
                                                 strokeIndex,
                                                 false,
                                             )} coordinate"
@@ -393,6 +395,12 @@
                                             bind:checked={holeScore.fullShots[strokeIndex].penalty}
                                         />
                                     </td>
+                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
+                                        <span>{getFormattedDistanceForFullShot(strokeIndex)}</span>
+                                    </td>
+                                    <td class={holeScore.fullShots[strokeIndex].penalty ? 'penalty-cell' : ''}>
+                                        <span>{getFormattedDistanceToGreen(strokeIndex)}</span>
+                                    </td>
                                     <td>
                                         <button class="btn btn-danger" on:click={() => removeStroke(strokeIndex)}>
                                             <i class="fa-solid fa-trash"></i>
@@ -404,11 +412,24 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+    <div class="card mt-2">
+        <div class="card-body">
+            <slot />
+        </div>
+    </div>
+    <div class="card mt-2">
+        <div class="card-body">
+            <div class="card-title">
+                <h2>Add Putts</h2>
+                <button class="btn btn-info btn-right" on:click={addPutt}>Add Putt</button>
+            </div>
             <div class="putting-entry">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th style="width: 30px" scope="col">Stroke</th>
+                            <th scope="col">Stroke</th>
                             <th scope="col">Putt</th>
                             <th scope="col">Distance (Feet)</th>
                             <th scope="col"></th>
@@ -424,6 +445,7 @@
                                         <input
                                             class="form-control"
                                             type="text"
+                                            on:focus={handleFocus}
                                             bind:value={holeScore.putts[puttIndex].distance}
                                         />
                                     </td>
@@ -438,36 +460,42 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-buttons">
-                <div class="card-right">
-                    {#if hole?.holeNumber !== 1}
-                        <a href="/" on:click|preventDefault={saveAndGoToPrevious} class="btn btn-success">
-                            <i class="fa-solid fa-arrow-left"></i> Previous
-                        </a>
-                    {/if}
-                    {#if hole?.holeNumber < round.holesCompleted}
-                        <a href="/" on:click|preventDefault={saveAndGoToNext} class="btn btn-success">
-                            <i class="fa-solid fa-arrow-right"></i> Save and go to next
-                        </a>
-                    {:else}
-                        <a href="/" on:click|preventDefault={advance} class="btn btn-success">
-                            <i class="fa-solid fa-check"></i> Finish Round
-                        </a>
-                    {/if}
-                </div>
-            </div>
         </div>
+    </div>
+    <div class="mt-2">
+        {#if hole?.holeNumber !== 1}
+            <a href="/" on:click|preventDefault={saveAndGoToPrevious} class="btn btn-success">
+                <i class="fa-solid fa-arrow-left"></i> Previous
+            </a>
+        {/if}
+        {#if hole?.holeNumber < round.holesCompleted}
+            <a href="/" on:click|preventDefault={saveAndGoToNext} class="btn btn-success">
+                <i class="fa-solid fa-arrow-right"></i> Save and go to next
+            </a>
+        {:else}
+            <a href="/" on:click|preventDefault={advance} class="btn btn-success">
+                <i class="fa-solid fa-check"></i> Finish Round
+            </a>
+        {/if}
     </div>
 {/if}
 
 <style>
+    .coordinate-button {
+        font-size: 12px;
+    }
+    .club-select {
+        width: 80px;
+    }
+    .btn-right {
+        margin-left: auto;
+    }
+    .table {
+        margin-bottom: 0;
+    }
     td {
         text-align: center;
         vertical-align: middle;
-    }
-    .card {
-        max-height: 85vh;
-        overflow-y: scroll;
     }
     .tee-color {
         display: block;

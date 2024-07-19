@@ -60,10 +60,7 @@
     }
 
     async function fetchCurrentlySelectedHoleDetails() {
-        let nextHoleDetails = await api.fetchHoleDetails(
-            id,
-            currentlySelectedHoleNumber,
-        );
+        let nextHoleDetails = await api.fetchHoleDetails(id, currentlySelectedHoleNumber);
         if (nextHoleDetails) {
             selectedHole = nextHoleDetails;
         }
@@ -86,48 +83,29 @@
         </div>
     </div>
     <div class="col-4">
-        <CourseFormCard
-            bind:course
-            saveCourse={async () => await api.saveCourse(id, course)}
-            {tees}
-        />
+        <CourseFormCard bind:course saveCourse={async () => await api.saveCourse(id, course)} {tees} />
         <div class="card">
             <div class="card-body">
                 <h5 class="hole-card-title card-title">
                     Hole {currentlySelectedHoleNumber}
-                    <span class="par-badge badge text-bg-success ml-2"
-                        >Par {selectedHole.par}</span
-                    >
+                    <span class="par-badge badge text-bg-success ml-2">Par {selectedHole.par}</span>
                     <div class="next-and-prev">
-                        <div
-                            class="btn-group mr-2"
-                            role="group"
-                            aria-label="First group"
-                        >
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
                             {#if currentlySelectedHoleNumber > 1}
-                                <btn
-                                    rel="external"
-                                    class="btn btn-secondary"
-                                    on:click={selectPreviousHole}
+                                <btn rel="external" class="btn btn-secondary" on:click={selectPreviousHole}
                                     ><i class="fa-solid fa-arrow-left"></i></btn
                                 >
                             {/if}
                             {#if currentlySelectedHoleNumber < course.numberOfHoles}
-                                <btn
-                                    class="btn btn-secondary"
-                                    on:click={selectNextHole}
-                                    ><i class="fa-solid fa-arrow-right"
-                                    ></i></btn
+                                <btn class="btn btn-secondary" on:click={selectNextHole}
+                                    ><i class="fa-solid fa-arrow-right"></i></btn
                                 >
                             {/if}
                         </div>
                     </div>
                 </h5>
                 <div class="card-buttons">
-                    <a
-                        href="/courses/{id}/{currentlySelectedHoleNumber}"
-                        class="btn btn-primary"
-                    >
+                    <a href="/courses/{id}/holes" class="btn btn-primary">
                         <i class="fa-solid fa-edit"></i> Edit Hole
                     </a>
                 </div>

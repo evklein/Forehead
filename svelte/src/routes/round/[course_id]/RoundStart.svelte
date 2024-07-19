@@ -150,15 +150,17 @@
                     </div>
                 </div>
                 <div class="col-12 text-center">
-                    <button class="btn btn-success" on:click={advance}>
-                        <i class="fa-solid fa-arrow-right"></i>
-                        {continuing ? 'Continue ' : 'Start '} Round
-                    </button>
-                    {#if continuing}
-                        <button class="btn btn-warning" on:click={advanceToFinalizePage}>
-                            <i class="fa-solid fa-table"></i> View Scorecard
+                    <div class="btn-group">
+                        <button class="btn btn-success" on:click={advance}>
+                            <i class="fa-solid fa-arrow-right"></i>
+                            {continuing ? 'Continue ' : 'Start '} Round
                         </button>
-                    {/if}
+                        {#if continuing}
+                            <button class="btn btn-warning" on:click={advanceToFinalizePage}>
+                                <i class="fa-solid fa-table"></i> View Scorecard
+                            </button>
+                        {/if}
+                    </div>
                 </div>
             </div>
         </div>

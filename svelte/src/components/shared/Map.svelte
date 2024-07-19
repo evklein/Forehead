@@ -19,6 +19,7 @@
     });
 
     afterUpdate(async () => {
+        await buildMap();
         await placeMarkers(markers);
     });
 
@@ -28,23 +29,24 @@
 
         if (!map) {
             map = L.map('map').setView([0, 0], 0);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
                 maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
             }).addTo(map);
 
             if (focusBounds.length > 0) {
                 map.fitBounds(focusBounds);
                 if (highlightSelectedbounds) {
                     L.polygon(focusBounds, {
-                        fillColor: 'green',
-                        color: 'green',
+                        fillColor: 'transparent',
+                        color: 'white',
                     }).addTo(map);
                 }
             }
 
             map.on('click', (e) => {
                 let wrappedCoordinates = e.latlng.wrap();
+                navigator.clipboard.writeText(`[${wrappedCoordinates.lat}, ${wrappedCoordinates.lng}]`);
                 if (handleSelectPointOnMap) {
                     handleSelectPointOnMap([wrappedCoordinates.lat, wrappedCoordinates.lng]);
                 }
@@ -68,7 +70,11 @@
             let leafletMarker;
             switch (markerChoice) {
                 case MapMarkerChoice.Default:
-                    leafletMarker = L.marker(marker.coordinates).addTo(markerLayerGroup);
+                    leafletMarker = L.circleMarker(marker.coordinates, {
+                        fillColor: 'white',
+                        color: 'white',
+                        radius: 4,
+                    }).addTo(markerLayerGroup);
                     leafletMarker.bindPopup(`[${marker.coordinates[0]}, ${marker.coordinates[1]}]`);
                     break;
                 case MapMarkerChoice.ShotTracer:
