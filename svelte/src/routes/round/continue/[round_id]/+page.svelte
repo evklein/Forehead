@@ -37,7 +37,6 @@
             let roundStats = await api.fetchRoundHoleStats(roundId);
             let roundStrokes = await api.fetchRoundStrokes(roundId);
             let roundPutts = await api.fetchRoundPutts(roundId);
-
             let courseDetails = await api.fetchCourseDetails(round.courseId ?? -1);
             if (courseDetails) {
                 course = courseDetails;
@@ -47,24 +46,23 @@
             holes = await api.fetchHoles(course.courseId);
 
             if (course && course.numberOfHoles && roundStats && roundStrokes && roundPutts) {
+                let holeOffset = holes[0].id ?? 0;
+                console.log('HOLE OFFSET: ' + holeOffset);
                 for (let i = 0; i < course.numberOfHoles; i++) {
                     holeScores = [
                         ...holeScores,
                         {
-                            stats: roundStats.filter((s) => s.holeNumber === i + 1)[0] ?? {
+                            stats: roundStats.filter((s) => s.holeNumber - holeOffset === i)[0] ?? {
                                 greenInRegulation: false,
                                 greenLightDrive: false,
                             },
-                            fullShots: roundStrokes.filter((s) => s.holeNumber === i + 1),
-                            putts: roundPutts.filter((s) => s.holeNumber === i + 1),
+                            fullShots: roundStrokes.filter((s) => s.holeNumber - holeOffset === i),
+                            putts: roundPutts.filter((s) => s.holeNumber - holeOffset === i),
                         },
                     ];
                 }
             }
         }
-
-        console.log('all loading has occurred.');
-        console.log(holeScores);
     });
 
     async function advanceToFinalizePage() {

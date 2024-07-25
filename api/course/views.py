@@ -16,7 +16,6 @@ def all(request):
 
 def details(request, course_id):
     course = Course.objects.get(pk=course_id)
-    print(course.name)
     data = serializers.serialize('json', [course], ensure_ascii=False)
     trimmed_data = data[1:-1]
     return HttpResponse(trimmed_data, content_type='application/json')

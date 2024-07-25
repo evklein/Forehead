@@ -3,5 +3,5 @@ export interface HoleStatsData {
     greenLightDrive: boolean;
     scrambling?: boolean;
     roundId?: number;
-    holeNumber?: number;
+    holeNumber: number;
 }
