@@ -15,15 +15,21 @@
 
     $: getCumulativeStrokeForHole = (holeNumber: number) => {
         console.log(strokes);
-        return strokes?.filter((s) => s.holeNumber === holeNumber).length + getCumultativePuttsForHole(holeNumber);
+        let holeOffset = holes[0].id ?? 0;
+        return (
+            strokes?.filter((s) => s.holeNumber - holeOffset === holeNumber - 1).length +
+            getCumultativePuttsForHole(holeNumber)
+        );
     };
 
     function getCumultativePuttsForHole(holeNumber: number): number {
-        return putts?.filter((p) => p.holeNumber === holeNumber).length;
+        let holeOffset = holes[0].id ?? 0;
+        return putts?.filter((p) => p.holeNumber - holeOffset === holeNumber - 1).length;
     }
 
     function getStatsForHole(holeNumber: number): HoleStatsData | undefined {
-        return stats?.find((s) => s.holeNumber === holeNumber);
+        let holeOffset = holes[0].id ?? 0;
+        return stats?.find((s) => s.holeNumber - holeOffset === holeNumber - 1);
     }
 
     function getFinalScore() {
