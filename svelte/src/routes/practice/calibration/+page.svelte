@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import * as api from '../../../services/api';
     import type { CalibrationResultsData } from '../../../models/CalibrationResultsData';
+    import LoadSpinner from '../../../components/shared/LoadSpinner.svelte';
 
     let numberOfShots: number = 20;
 
@@ -12,6 +13,8 @@
     let faceStrikeValues: string[] = [];
     let directionValues: string[] = [];
     let recentCalibrationResults: CalibrationResultsData[] = [];
+    let loadingPreviousTests: boolean = false;
+    let savingNewTest: boolean = false;
 
     function resetValues() {
         groundStrikeValues = Array(numberOfShots).fill('');
@@ -21,7 +24,9 @@
 
     onMount(async () => {
         resetValues();
-        getRecentCalibrationResults();
+        loadingPreviousTests = true;
+        await getRecentCalibrationResults();
+        loadingPreviousTests = false;
     });
 
     async function getRecentCalibrationResults() {
@@ -29,6 +34,7 @@
     }
 
     async function saveCalibrationResults() {
+        savingNewTest = true;
         let drillData = JSON.stringify({
             groundStrikeValues: groundStrikeValues,
             faceStrikeValues: faceStrikeValues,
@@ -37,6 +43,7 @@
         await api.saveDrillResults(drillData, 'swing_calibration');
         resetValues();
         await getRecentCalibrationResults();
+        savingNewTest = false;
     }
 </script>
 
@@ -110,8 +117,17 @@
                     </tbody>
                 </table>
                 <div class="lower-buttons btn-group">
-                    <button type="button" class="btn btn-lg btn-success" on:click={saveCalibrationResults}>
-                        <i class="fa-solid fa-floppy-disk"></i> &nbsp;Save Results
+                    <button
+                        type="button"
+                        class="btn btn-lg btn-success"
+                        on:click={saveCalibrationResults}
+                        disabled={savingNewTest}
+                    >
+                        {#if savingNewTest}
+                            <LoadSpinner message={'Saving calibration'} />
+                        {:else}
+                            <i class="fa-solid fa-floppy-disk"></i> &nbsp;Save Results
+                        {/if}
                     </button>
                     <button type="button" class="btn btn-lg btn-secondary" on:click={resetValues}> Restart </button>
                 </div>
@@ -120,26 +136,30 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h4 class="card-title">Previous Tests</h4>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Ground Strikes</th>
-                            <th>Face Strikes</th>
-                            <th>Direction</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each recentCalibrationResults as recentCalibrationResult}
+                {#if loadingPreviousTests}
+                    <LoadSpinner sizePx={28} message={'Loading calibrations...'} />
+                {:else}
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>{recentCalibrationResult.date.toLocaleDateString()}</td>
-                                <td>{recentCalibrationResult.groundStrikeSuccesses}/20</td>
-                                <td>{recentCalibrationResult.faceStrikeSuccesses}/20</td>
-                                <td>{recentCalibrationResult.directionSuccesses}/20</td>
+                                <th>Date</th>
+                                <th>Ground Strikes</th>
+                                <th>Face Strikes</th>
+                                <th>Direction</th>
                             </tr>
-                        {/each}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {#each recentCalibrationResults as recentCalibrationResult}
+                                <tr>
+                                    <td>{recentCalibrationResult.date.toLocaleDateString()}</td>
+                                    <td>{recentCalibrationResult.groundStrikeSuccesses}/20</td>
+                                    <td>{recentCalibrationResult.faceStrikeSuccesses}/20</td>
+                                    <td>{recentCalibrationResult.directionSuccesses}/20</td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                {/if}
             </div>
         </div>
     </div>

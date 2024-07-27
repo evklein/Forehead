@@ -8,6 +8,7 @@
     import type { RoundData } from '../../models/RoundData';
     import type { TeeData } from '../../models/TeeData';
     import { onMount } from 'svelte';
+    import LoadSpinner from '../shared/LoadSpinner.svelte';
 
     // Props
     export let course: CourseData;
@@ -24,6 +25,7 @@
 
     let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
     let selectedTeeId: number | undefined = round.playedTeeId;
+    let savingHole: boolean = false;
 
     function addFullShot(startCoordinates?: [number, number]) {
         let newStrokeNumber = holeScore.fullShots.length;
@@ -164,6 +166,7 @@
     };
 
     async function saveAll() {
+        savingHole = true;
         if (round.id && hole.id) {
             await api.purgeHoleShots(round.id, hole.id);
             await api.saveHoleStats(round.id, hole.id, holeScore.stats);
@@ -190,6 +193,7 @@
                 await api.savePutt(round.id, hole.id, putt);
             }
         }
+        savingHole = false;
     }
 
     async function saveAndGoToNext() {
@@ -469,9 +473,13 @@
             </a>
         {/if}
         {#if hole?.holeNumber < round.holesCompleted}
-            <a href="/" on:click|preventDefault={saveAndGoToNext} class="btn btn-success">
-                <i class="fa-solid fa-arrow-right"></i> Save and go to next
-            </a>
+            <button on:click|preventDefault={saveAndGoToNext} class="btn btn-success" disabled={savingHole}>
+                {#if savingHole}
+                    <LoadSpinner message={'Saving hole'} />
+                {:else}
+                    <i class="fa-solid fa-arrow-right"></i> Save and go to next
+                {/if}
+            </button>
         {:else}
             <a href="/" on:click|preventDefault={advance} class="btn btn-success">
                 <i class="fa-solid fa-check"></i> Finish Round

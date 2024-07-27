@@ -3,6 +3,7 @@
     import type { ScrambleGameData } from '../../../models/ScrambleGameData';
     import * as api from '../../../services/api';
     import type { ScrambleRoundData } from '../../../models/ScrambleRoundData';
+    import LoadSpinner from '../../../components/shared/LoadSpinner.svelte';
 
     let scrambleGameData: ScrambleGameData = {
         holeChips: Array(18).fill(0),
@@ -10,6 +11,8 @@
         holeYardages: Array(18).fill(0),
     };
     let recentRoundData: ScrambleRoundData[] = [];
+    let loadingRecentScores: boolean = false;
+    let savingNewGame: boolean = false;
 
     $: holeScores = scrambleGameData.holeChips.map((_, i) => getHoleScore(i));
     $: holeBorders = holeScores.map((score) => getBorderForHoleScore(score));
@@ -19,7 +22,9 @@
     $: totalScore = totalChips + totalPutts;
 
     onMount(async () => {
+        loadingRecentScores = true;
         await getRecentRounds();
+        loadingRecentScores = false;
 
         let minYardage = 5;
         let maxYardage = 30;
@@ -62,8 +67,13 @@
     }
 
     async function saveScrambleRound() {
+        savingNewGame = true;
         await api.saveScrambleGame(scrambleGameData);
+        savingNewGame = false;
+
+        loadingRecentScores = true;
         await getRecentRounds();
+        loadingRecentScores = false;
     }
 </script>
 
@@ -145,8 +155,17 @@
                     </tbody>
                 </table>
                 <div class="lower-buttons btn-group">
-                    <button type="button" class="btn btn-lg btn-success" on:click={saveScrambleRound}>
-                        <i class="fa-solid fa-floppy-disk"></i> &nbsp;Save game
+                    <button
+                        type="button"
+                        class="btn btn-lg btn-success"
+                        on:click={saveScrambleRound}
+                        disabled={savingNewGame}
+                    >
+                        {#if savingNewGame}
+                            <LoadSpinner message={'Saving game...'} />
+                        {:else}
+                            <i class="fa-solid fa-floppy-disk"></i> &nbsp;Save game
+                        {/if}
                     </button>
                     <button type="button" class="btn btn-lg btn-secondary"> Restart </button>
                 </div>
@@ -157,26 +176,30 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h4 class="card-title"><i class="fa-solid fa-star"></i> &nbsp;Recent Scores</h4>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Total</th>
-                            <th>Score</th>
-                            <th>Yards</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each recentRoundData as round}
+                {#if loadingRecentScores}
+                    <LoadSpinner sizePx={28} message={'Loading recent scores...'} />
+                {:else}
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <td>{round.date.toLocaleDateString()}</td>
-                                <td>{round.total}</td>
-                                <td>{round.total > 36 ? '+' : ''}{round.total - 36}</td>
-                                <td>{round.yards} yards</td>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Score</th>
+                                <th>Yards</th>
                             </tr>
-                        {/each}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {#each recentRoundData as round}
+                                <tr>
+                                    <td>{round.date.toLocaleDateString()}</td>
+                                    <td>{round.total}</td>
+                                    <td>{round.total > 36 ? '+' : ''}{round.total - 36}</td>
+                                    <td>{round.yards} yards</td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                {/if}
             </div>
         </div>
     </div>

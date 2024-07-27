@@ -4,6 +4,7 @@
     import type { RoundData } from '../../models/RoundData';
     import InProgressRoundCard from './InProgressRoundCard.svelte';
     import * as api from '../../services/api';
+    import LoadSpinner from '../../components/shared/LoadSpinner.svelte';
 
     export let rounds: RoundData[] = [];
     export let courses: CourseData[] = [];
@@ -44,7 +45,7 @@
     <div class="col-12 mt-4">
         <h2>In-Progress Rounds</h2>
         {#if loading}
-            <span class="loading">Loading...</span>
+            <LoadSpinner />
         {:else if rounds.length === 0}
             <span class="no-rounds">No in-progress rounds found.</span>
         {:else}
