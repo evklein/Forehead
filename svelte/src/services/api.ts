@@ -9,7 +9,7 @@ import type { RoundData } from '../models/RoundData';
 import type { PracticeStrokeData } from '../models/PracticeStrokeData';
 import type { ScrambleGameData } from '../models/ScrambleGameData';
 import type { ScrambleRoundData } from '../models/ScrambleRoundData';
-import type { CalibrationResultsData } from '../models/CalibrationResultsData';
+import type { CalibrationResultsData, ChippingCalibrationResultsData, PuttingCalibrationResultsData } from '../models/CalibrationResultsData';
 
 const FOREHEAD_API_URL =
     import.meta.env.VITE_BONK_API_URL ?? 'http://localhost:8000';
@@ -444,7 +444,7 @@ export async function saveScrambleGame(practiceGame: ScrambleGameData) {
 export async function saveDrillResults(stringifiedDrillData: string, drillType: string) {
     const endpoint = `/practice/game/`;
     let requestBody: string = JSON.stringify({
-        game_type: 'swing_calibration',
+        game_type: drillType,
         game_data: stringifiedDrillData
     });
     try {
@@ -590,6 +590,52 @@ export async function getRecentCalibrationResults(): Promise<CalibrationResultsD
                 groundStrikeSuccesses: nextTest['ground_strike_successes'],
                 faceStrikeSuccesses: nextTest['face_strike_successes'],
                 directionSuccesses: nextTest['direction_successes']
+            });
+        }
+        return results;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getRecentChippingCalibrationResults(): Promise<ChippingCalibrationResultsData[] | null> {
+    const endpoint = `/practice/chipping-calibrations/recent/`;
+    try {
+        const rawData = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
+        let results: ChippingCalibrationResultsData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextTest = rawData[i];
+            results.push({
+                date: new Date(nextTest['date']),
+                groundStrikeSuccesses: nextTest['ground_strike_successes'],
+                faceStrikeSuccesses: nextTest['face_strike_successes'],
+                distanceSuccesses: nextTest['distance_successes'],
+                directionSuccesses: nextTest['direction_successes']
+            });
+        }
+        return results;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return null;
+    }
+}
+
+export async function getRecentPuttingCalibrationResults(): Promise<PuttingCalibrationResultsData[] | null> {
+    const endpoint = `/practice/putting-calibrations/recent/`;
+    try {
+        const rawData = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
+        let results: PuttingCalibrationResultsData[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextTest = rawData[i];
+            results.push({
+                date: new Date(nextTest['date']),
+                distanceControlSuccesses: nextTest['distance_control_successes'],
+                holeSideHigh: nextTest['hole_side_high'],
+                holeSideLow: nextTest['hole_side_low'],
+                numberHoled: nextTest['number_holed']
             });
         }
         return results;

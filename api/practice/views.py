@@ -74,3 +74,46 @@ def getRecentCalibrations(request):
         })
 
     return JsonResponse(results, safe=False)
+
+def getRecentChippingCalibrations(request):
+    drills = PracticeGame.objects.filter(game_type='chipping_calibration').order_by('-date')[:10]
+    results = []
+    for drill in drills:
+        deserialized_drill_data = json.loads(drill.game_data)
+        ground_strike_successes = deserialized_drill_data['groundStrikeValues'].count('Good')
+        face_strike_successes = deserialized_drill_data['faceStrikeValues'].count('Sweet spot')
+        distance_successes = deserialized_drill_data['distanceValues'].count('Good')
+        direction_successes = deserialized_drill_data['directionValues'].count('Within Target Area')
+
+        results.append({
+            'date': drill.date,
+            'ground_strike_successes': ground_strike_successes,
+            'face_strike_successes': face_strike_successes,
+            'distance_successes': distance_successes,
+            'direction_successes': direction_successes
+        })
+
+    return JsonResponse(results, safe=False)
+
+def getRecentPuttingCalibrations(request):
+    drills = PracticeGame.objects.filter(game_type='putting_calibration').order_by('-date')[:10]
+    results = []
+    for drill in drills:
+        deserialized_drill_data = json.loads(drill.game_data)
+        distance_control_values = deserialized_drill_data['distanceControlValues']
+        hole_side_values = deserialized_drill_data['holeSideValues']
+
+        distance_control_successes = distance_control_values.count('Good')
+        hole_side_high = hole_side_values.count('High')
+        hole_side_low = hole_side_values.count('Low')
+        number_holed = hole_side_values.count('Holed')
+
+        results.append({
+            'date': drill.date,
+            'distance_control_successes': distance_control_successes,
+            'hole_side_high': hole_side_high,
+            'hole_side_low': hole_side_low,
+            'number_holed': number_holed
+        })
+
+    return JsonResponse(results, safe=False)

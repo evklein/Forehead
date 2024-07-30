@@ -22,6 +22,20 @@
         description="Test swing for weaknesses."
         imagePath="https://media.istockphoto.com/id/1289137258/photo/asian-chinese-mature-man-golf-couch-teaching-young-male-student-to-play-golf-at-driving-range.jpg?s=612x612&w=0&k=20&c=upfK8gdl0rzw_a-xLlGDM2TwgVR5Ke3LbmniwDJFunQ="
         link="/practice/calibration"
-        badgeText="Drill"
+        badgeText="Calibration"
+    />
+    <PracticeModeCard
+        mode="Chipping Calibration"
+        description="Test short game"
+        imagePath="https://t3.ftcdn.net/jpg/00/34/76/76/360_F_34767677_Dqf96hfvrHnk0guiMRHbfBxhAYBqD0VG.jpg"
+        link="/practice/chipping-calibration"
+        badgeText="Calibration"
+    />
+    <PracticeModeCard
+        mode="Putting Calibration"
+        description="Test putting"
+        imagePath="https://media.istockphoto.com/id/882323218/photo/this-is-going-to-be-in.jpg?s=612x612&w=0&k=20&c=vX4pi2tVwE3unRMc443FlJmzI4wT4KlIzXAh0HXZQuU="
+        link="/practice/putting-calibration"
+        badgeText="Calibration"
     />
 </div>
