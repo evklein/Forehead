@@ -10,6 +10,7 @@ import type { PracticeStrokeData } from '../models/PracticeStrokeData';
 import type { ScrambleGameData } from '../models/ScrambleGameData';
 import type { ScrambleRoundData } from '../models/ScrambleRoundData';
 import type { CalibrationResultsData, ChippingCalibrationResultsData, PuttingCalibrationResultsData } from '../models/CalibrationResultsData';
+import type { DifferentialResults } from '../models/DifferentialResults';
 
 const FOREHEAD_API_URL =
     import.meta.env.VITE_BONK_API_URL ?? 'http://localhost:8000';
@@ -636,6 +637,37 @@ export async function getRecentPuttingCalibrationResults(): Promise<PuttingCalib
                 holeSideHigh: nextTest['hole_side_high'],
                 holeSideLow: nextTest['hole_side_low'],
                 numberHoled: nextTest['number_holed']
+            });
+        }
+        return results;
+    } catch (error) {
+        console.error(`${endpoint}: request failed.`);
+        console.error(error);
+        return null;
+    }
+}
+
+
+
+export async function getRecentDifferentialResults(): Promise<DifferentialResults[] | null> {
+    const endpoint = `/practice/differentials/recent/`;
+    try {
+        const rawData = await apiHelpers.get(FOREHEAD_API_URL, endpoint);
+        let results: DifferentialResults[] = [];
+        for (let i = 0; i < rawData.length; i++) {
+            let nextTest = rawData[i];
+            results.push({
+                date: new Date(nextTest['date']),
+                numberOfToes: nextTest['num_toes'],
+                numberOfHeels: nextTest['num_heels'],
+                numberOfSweetSpots: nextTest['num_sweet_spots'],
+                numberOfTops: nextTest['num_tops'],
+                numberOfThins: nextTest['num_thins'],
+                numberOfFats: nextTest['num_fats'],
+                numberOfGoodStrikes: nextTest['num_good_strikes'],
+                numberOfDraws: nextTest['num_draws'],
+                numberOfFades: nextTest['num_fades'],
+                numberOfStraights: nextTest['num_straight'],
             });
         }
         return results;

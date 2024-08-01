@@ -11,6 +11,13 @@
         link="/practice/range"
     />
     <PracticeModeCard
+        mode="Differential Practice"
+        description="Practice strike variations"
+        imagePath="https://media.istockphoto.com/id/526981293/photo/golf-shot-man.jpg?s=612x612&w=0&k=20&c=IBDh5VFUijopK_nrU02RQ_lPIX4n-IdMWNAH6KjYrRs="
+        link="/practice/differential"
+        badgeText="Drill"
+    />
+    <PracticeModeCard
         mode="Up & Down"
         description="18 holes - chipping and putting only."
         imagePath="https://media.istockphoto.com/id/472810042/photo/golfer-chipping.jpg?s=612x612&w=0&k=20&c=laQx0K1DEtrP4Dj9jxENLarfmTCpxRe3opoz5AJsB7o="

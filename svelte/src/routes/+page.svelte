@@ -48,6 +48,21 @@
                 </div>
             </a>
         </div>
+        <div class="col-xs-12 col-lg-4">
+            <a href="/dashboard">
+                <div class="card">
+                    <img
+                        class="card-img-top"
+                        src="https://t3.ftcdn.net/jpg/03/54/00/74/360_F_354007466_mm4QilA3n92YWPseqs82gbWxbb06R1i4.jpg"
+                        alt="Course"
+                    />
+                    <div class="card-body">
+                        <h5 class="card-title">Skills</h5>
+                        <p class="card-text">Track skills over time.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 

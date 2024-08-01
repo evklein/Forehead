@@ -117,3 +117,25 @@ def getRecentPuttingCalibrations(request):
         })
 
     return JsonResponse(results, safe=False)
+
+
+def getRecentDifferentialSessions(request):
+    drills = PracticeGame.objects.filter(game_type='differential').order_by('-date')[:10]
+    results = []
+    for drill in drills:
+        deserialized_drill_data = json.loads(drill.game_data)
+        results.append({
+            'date': drill.date,
+            'num_toes': deserialized_drill_data['toes'].count(True),
+            'num_heels': deserialized_drill_data['heels'].count(True),
+            'num_sweet_spots': deserialized_drill_data['sweetSpots'].count(True),
+            'num_tops': deserialized_drill_data['tops'].count(True),
+            'num_thins': deserialized_drill_data['thins'].count(True),
+            'num_fats': deserialized_drill_data['fats'].count(True),
+            'num_good_strikes': deserialized_drill_data['goodStrikes'].count(True),
+            'num_draws': deserialized_drill_data['draws'].count(True),
+            'num_fades': deserialized_drill_data['fades'].count(True),
+            'num_straight': deserialized_drill_data['straight'].count(True),
+        })
+
+    return JsonResponse(results, safe=False)
