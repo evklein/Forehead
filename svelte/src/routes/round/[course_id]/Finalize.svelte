@@ -32,38 +32,44 @@
         return stats?.find((s) => s.holeNumber - holeOffset === holeNumber - 1);
     }
 
-    function getFinalScore() {
-        return holes.reduce((total, nextHole) => total + getCumulativeStrokeForHole(nextHole.holeNumber), 0);
+    function getCumulativeScoreForHoles(start: number, end: number) {
+        return holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + getCumulativeStrokeForHole(nextHole.holeNumber), 0);
     }
 
-    function getTotalGir() {
-        let totalGir = holes.reduce(
-            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenInRegulation ? 1 : 0),
-            0,
-        );
-        return totalGir;
+    function getCumulativePuttsForHoles(start: number, end: number) {
+        return holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + getCumultativePuttsForHole(nextHole.holeNumber), 0);
     }
 
-    function getTotalGld() {
-        let totalGld = holes.reduce(
-            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenLightDrive ? 1 : 0),
-            0,
-        );
-        let numberOfParThrees = holes.reduce((total, nextHole) => total + (nextHole.par === 3 ? 1 : 0), 0);
-        return `${totalGld}/${round.holesCompleted - numberOfParThrees}`;
+    function getCumulativeGIRForHoles(start: number, end: number) {
+        return holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenInRegulation ? 1 : 0), 0);
     }
 
-    function getTotalScrambling() {
-        let totalGir = getTotalGir();
-        let totalScrambling = holes.reduce(
-            (total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.scrambling ? 1 : 0),
-            0,
-        );
-        return `${totalScrambling}/${round.holesCompleted - totalGir}`;
+    function getCumulativeGLDForHoles(start: number, end: number) {
+        let numberOfParThrees = holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + (nextHole.par === 3 ? 1 : 0), 0);
+        let numberOfGLD = holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.greenLightDrive ? 1 : 0), 0);
+        return `${numberOfGLD}/${end - start - numberOfParThrees}`;
     }
 
-    function getTotalPutts() {
-        return holes.reduce((total, nextHole) => total + getCumultativePuttsForHole(nextHole.holeNumber), 0);
+    function getCumulativeScramblingForHoles(start: number, end: number) {
+        let numberOfMissedGreens = end - start - getCumulativeGIRForHoles(start, end);
+        let scrambles = holes
+            .slice(start, end)
+            .reduce((total, nextHole) => total + (getStatsForHole(nextHole.holeNumber)?.scrambling ? 1 : 0), 0);
+        return `${scrambles}/${numberOfMissedGreens}`;
+    }
+
+    function getCumulativeParForHoles(start: number, end: number) {
+        return holes.slice(start, end).reduce((total, nextHole) => total + nextHole.par, 0);
     }
 </script>
 
@@ -76,16 +82,20 @@
                         <thead>
                             <tr>
                                 <th scope="col"></th>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <th scope="col">{hole.holeNumber}</th>
+                                    {#if index === 8}
+                                        <th scope="col">Front</th>
+                                    {/if}
                                 {/each}
+                                <th scope="col">Back</th>
                                 <th scope="col">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Score</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <td>
                                         <span
                                             class="score-number"
@@ -97,27 +107,35 @@
                                             {getCumulativeStrokeForHole(hole.holeNumber)}
                                         </span>
                                     </td>
+                                    {#if index === 8}
+                                        <td>{getCumulativeScoreForHoles(0, 9)}</td>
+                                    {/if}
                                 {/each}
+                                <td>{getCumulativeScoreForHoles(9, 18)}</td>
                                 <td>
                                     <b>
-                                        {getFinalScore()}
+                                        {getCumulativeScoreForHoles(0, 18)}
                                     </b>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Putts</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <td>{getCumultativePuttsForHole(hole.holeNumber)}</td>
+                                    {#if index === 8}
+                                        <td>{getCumulativePuttsForHoles(0, 9)}</td>
+                                    {/if}
                                 {/each}
+                                <td>{getCumulativePuttsForHoles(9, 18)}</td>
                                 <td>
                                     <b>
-                                        {getTotalPutts()}
+                                        {getCumulativePuttsForHoles(0, 18)}
                                     </b>
                                 </td>
                             </tr>
                             <tr>
                                 <td>GIR</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <td>
                                         <input
                                             type="checkbox"
@@ -126,14 +144,18 @@
                                             disabled
                                         />
                                     </td>
+                                    {#if index === 8}
+                                        <td>{getCumulativeGIRForHoles(0, 9)}/9</td>
+                                    {/if}
                                 {/each}
+                                <td>{getCumulativeGIRForHoles(9, 18)}/9</td>
                                 <td>
-                                    <b>{getTotalGir()}/{round.holesCompleted}</b>
+                                    <b>{getCumulativeGIRForHoles(0, 18)}/{round.holesCompleted}</b>
                                 </td>
                             </tr>
                             <tr>
                                 <td>GLD</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <td>
                                         {#if hole.par > 3}
                                             <input
@@ -145,14 +167,19 @@
                                         {:else}
                                             <span>-</span>
                                         {/if}
-                                    </td>{/each}
+                                    </td>
+                                    {#if index === 8}
+                                        <td>{getCumulativeGLDForHoles(0, 9)}</td>
+                                    {/if}
+                                {/each}
+                                <td>{getCumulativeGLDForHoles(9, 18)}</td>
                                 <td>
-                                    <b>{getTotalGld()}</b>
+                                    <b>{getCumulativeGLDForHoles(0, 18)}</b>
                                 </td>
                             </tr>
                             <tr>
                                 <td>SCR</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     {#if !getStatsForHole(hole.holeNumber)?.greenInRegulation}
                                         <td>
                                             <input
@@ -165,16 +192,24 @@
                                     {:else}
                                         <td><span>-</span></td>
                                     {/if}
+                                    {#if index === 8}
+                                        <td>{getCumulativeScramblingForHoles(0, 9)}</td>
+                                    {/if}
                                 {/each}
+                                <td>{getCumulativeScramblingForHoles(9, 18)}</td>
                                 <td>
-                                    <b>{getTotalScrambling()}</b>
+                                    <b>{getCumulativeScramblingForHoles(0, 18)}</b>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Par</td>
-                                {#each holes as hole}
+                                {#each holes as hole, index}
                                     <td>{hole.par}</td>
+                                    {#if index === 8}
+                                        <td>{getCumulativeParForHoles(0, 9)}</td>
+                                    {/if}
                                 {/each}
+                                <td>{getCumulativeParForHoles(9, 18)}</td>
                                 <td>
                                     <b>
                                         {course.par}
