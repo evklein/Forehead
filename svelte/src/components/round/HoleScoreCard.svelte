@@ -23,7 +23,22 @@
     export let selectedShotCoordinateIndex: number;
     export let selectedShotCoordinateStart: boolean;
 
-    let clubs: string[] = ['62°', '56°', '50°', 'P', '9', '8', '7', '6', '5', '4H', '3H', '3W', 'D'].reverse();
+    let clubs: string[] = [
+        'Putter',
+        '60°',
+        '56°',
+        '52°',
+        'P',
+        '9',
+        '8',
+        '7',
+        '6',
+        '5',
+        '4H',
+        '3H',
+        '3W',
+        'D',
+    ].reverse();
     let selectedTeeId: number | undefined = round.playedTeeId;
     let savingHole: boolean = false;
 
