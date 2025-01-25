@@ -10,6 +10,7 @@
     export let round: RoundData;
     export let tees: TeeData[];
     export let handleAdvance: Function;
+    export let handleAdvanceToLastPlayedHole: Function;
     export let handleAdvanceToFinal: Function;
 
     async function advance() {
@@ -20,6 +21,10 @@
             round.id = await api.saveNewRound(round, course.courseId);
         }
         handleAdvance();
+    }
+
+    async function advanceToLastPlayedHole() {
+        handleAdvanceToLastPlayedHole();
     }
 
     function advanceToFinalizePage() {
@@ -154,6 +159,9 @@
                         <button class="btn btn-success" on:click={advance}>
                             <i class="fa-solid fa-arrow-right"></i>
                             {continuing ? 'Continue ' : 'Start '} Round
+                        </button>
+                        <button class="btn btn-info" on:click={advanceToLastPlayedHole}>
+                            Go to last played hole
                         </button>
                         {#if continuing}
                             <button class="btn btn-warning" on:click={advanceToFinalizePage}>
