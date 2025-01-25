@@ -17,10 +17,10 @@
     export let holes: HoleData[];
     export let holeScores: HoleScore[] = [];
     export let handleAdvance: EventHandler;
+    export let currentHoleIndex: number = 0;
 
     let selectedShotCoordinateIndex: number = -1;
     let selectedShotCoordinateStart: boolean = true;
-    let currentHoleIndex: number = 0;
     let currentHole: HoleData;
     let currentHoleScore: HoleScore;
 
@@ -52,6 +52,7 @@
     })();
 
     onMount(() => {
+        console.log('Current hole woo!' + currentHoleIndex);
         currentHole = holes[currentHoleIndex];
         currentHoleScore = holeScores[currentHoleIndex];
         resetSelectedShotIndex();

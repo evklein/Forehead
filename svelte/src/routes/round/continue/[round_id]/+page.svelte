@@ -31,6 +31,8 @@
     let roundStrokes: StrokeData[];
     let roundPutts: PuttData[];
 
+    let currentHoleIndex: number = 0;
+
     onMount(async () => {
         round = (await api.fetchRoundDetails(roundId)) ?? undefined;
         if (round) {
@@ -84,10 +86,27 @@
             bind:round
             {tees}
             handleAdvance={() => (entryStage = RoundStage.HoleEntry)}
+            handleAdvanceToLastPlayedHole={() => {
+                console.log('#####');
+                let lastHolePlayed = holeScores.findIndex((hs) => hs.fullShots.length == 0) ?? 17;
+                currentHoleIndex = lastHolePlayed == -1 ? 17 : lastHolePlayed - 1;
+                console.log(lastHolePlayed);
+                currentHoleIndex = lastHolePlayed;
+
+                entryStage = RoundStage.HoleEntry;
+            }}
             handleAdvanceToFinal={advanceToFinalizePage}
         />
     {:else if entryStage === RoundStage.HoleEntry}
-        <HoleEntry {round} {course} {holes} {holeScores} handleAdvance={advanceToFinalizePage} courseTees={tees} />
+        <HoleEntry
+            {round}
+            {course}
+            {holes}
+            {holeScores}
+            {currentHoleIndex}
+            handleAdvance={advanceToFinalizePage}
+            courseTees={tees}
+        />
     {:else if entryStage === RoundStage.Finalize}
         <Finalize {course} {round} {holes} stats={roundStats} strokes={roundStrokes} putts={roundPutts} />
     {/if}
